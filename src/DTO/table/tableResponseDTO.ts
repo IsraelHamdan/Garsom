@@ -12,4 +12,5 @@ export class TableResponseDTO implements Table {
   histories: History[];
   products: Product[];
   createdBy: User;
+  code: string;
 }

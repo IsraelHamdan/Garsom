@@ -4,6 +4,6 @@ import { User } from '@prisma/client';
 
 export interface CreateTableDTO {
   name?: string;
-  codigo: string;
+  code: string;
   createdBy: User;
 }
