@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { User } from '@prisma/client';
+import { User, Client, History, Table } from '@prisma/client';
 
 export class UserResponseDTO implements User {
   id: string;
@@ -7,4 +7,9 @@ export class UserResponseDTO implements User {
   email: string;
   password: string;
   tableId: string | null;
+
+  Client?: Client | null;
+  histories: History[] = [];
+  createdTables: Table[] = [];
+  table?: Table | null;
 }
