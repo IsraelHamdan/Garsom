@@ -1,13 +1,14 @@
 /* eslint-disable prettier/prettier */
-import { User, Client, History, Table } from '@prisma/client';
+import { Client, History, Table } from '@prisma/client';
 
-export class UserResponseDTO implements User {
+export class UserResponseDTO {
   id: string;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   tableId: string | null;
-
+  photoURL: string | null;
+  token: string;
   Client?: Client | null;
   histories?: History[] = [];
   createdTables?: Table[] = [];

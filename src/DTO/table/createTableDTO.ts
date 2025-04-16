@@ -1,9 +1,13 @@
 /* eslint-disable prettier/prettier */
+import { IsString } from 'class-validator';
 
-import { User } from '@prisma/client';
+export class CreateTableDTO {
+  @IsString()
+  name: string;
 
-export interface CreateTableDTO {
-  name?: string;
-  code: string;
-  createdBy: User;
+  @IsString()
+  userId: string;
+
+  @IsString()
+  code: string; // Código único da mesa gerado e validado no serviço
 }
