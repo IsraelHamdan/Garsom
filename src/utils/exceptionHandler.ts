@@ -38,7 +38,7 @@ export class ExceptionHandler {
       throw err; // Repassa exceções já tratadas no repositório
     }
     throw new InternalServerErrorException(
-      `Erro inesperado: ${err.message || err}`,
+      `Erro inesperado no controller: ${err.message || err}`,
     );
   }
 

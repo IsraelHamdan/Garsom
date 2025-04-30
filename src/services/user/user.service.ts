@@ -79,7 +79,7 @@ export class UserService {
       const { password, ...userWithoutPassword } = updatedUser;
       return userWithoutPassword as UserResponseDTO;
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError)
+      if (err instanceof PrismaClientKnownRequestError)
         throw new prismaError(err);
       throw new InternalServerErrorException(
         `Erro inesperado no servidor: ${err}`,

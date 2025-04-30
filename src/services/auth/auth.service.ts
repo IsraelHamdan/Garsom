@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import {
-  BadRequestException,
-  Injectable, InternalServerErrorException,
+  Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { TokenService } from '../token/token.service';
@@ -22,24 +22,17 @@ export class AuthService {
     private readonly userRespository: UserRepository,
   ) {}
 
-  async createUser(
-    data: CreateUserDTO,
-  ): Promise<UserResponseDTO> {
+  async createUser(data: CreateUserDTO): Promise<UserResponseDTO> {
     try {
-      const isPasswordValid = await bcrypt.compare(
-        data.password,
-        data.confirmPassword,
-      );
-
-      if (!isPasswordValid)
-        throw new BadRequestException('As senhas não conhecidem');
-
       const hashedPassword = await bcrypt.hash(data.password, 10);
 
       const newUser = { ...data, password: hashedPassword };
 
-      return await this.userRespository.createUser(newUser) as UserResponseDTO;
+      return (await this.userRespository.createUser(
+        newUser,
+      )) as UserResponseDTO;
     } catch (err) {
+      console.error('Erro no Controller:', err);
       this.exception.serviceExceptionHandler(err as Error);
     }
   }
@@ -49,7 +42,8 @@ export class AuthService {
       const user = await this.user.findUserByEmail(data.email);
       if (!user) throw new NotFoundException(`Usuário não encontrado`);
 
-      if(!user.password ) throw new InternalServerErrorException('Senha não encontrada')
+      if (!user.password)
+        throw new InternalServerErrorException('Senha não encontrada');
 
       const isPasswordValid = await bcrypt.compare(
         data.password,

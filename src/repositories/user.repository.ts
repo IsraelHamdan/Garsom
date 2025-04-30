@@ -1,15 +1,16 @@
 /* eslint-disable prettier/prettier */
 import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
 import { UserResponseDTO } from 'src/DTO/user/userResponseDTO';
-import { PrismaClient } from '@prisma/client';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { PrismaClientKnownRequestError } from 'prisma-better-errors';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/services/prisma/prisma.service';
 
+@Injectable()
 export class UserRepository {
   constructor(
-    private readonly prisma: PrismaClient,
+    private readonly prisma: PrismaService,
     private readonly exceptionHandler: ExceptionHandler,
   ) {}
 
@@ -19,6 +20,8 @@ export class UserRepository {
     try {
       return await this.prisma.user.create({ data });
     } catch (err) {
+      console.log('Erro no Repositório:', err);
+      console.log('ExceptionHandler está definido?', this.exceptionHandler);
       this.exceptionHandler.repositoryExceptionHandler(
         err as PrismaClientKnownRequestError | Error,
       );
@@ -75,7 +78,7 @@ export class UserRepository {
 
   async findMany(): Promise<UserResponseDTO[] | null> {
     try {
-      return await this.prisma.user.findMany() as UserResponseDTO[];
+      return (await this.prisma.user.findMany()) as UserResponseDTO[];
     } catch (err) {
       this.exceptionHandler.repositoryExceptionHandler(err as Error);
     }

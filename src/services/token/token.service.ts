@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient } from '@prisma/client';
 import { CreateTokenDTO } from 'src/DTO/token/createToken.dto';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 
@@ -10,7 +9,7 @@ export class TokenService {
   constructor(
     private readonly token: JwtService,
     private readonly exception: ExceptionHandler,
-    private readonly prisma: PrismaClient,
+
   ) {}
 
   generateAccessToken(data: CreateTokenDTO): string {
