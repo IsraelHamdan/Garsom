@@ -37,11 +37,10 @@ export class AuthService {
     }
   }
 
-  async login(data: LoginDTO): Promise<UserResponseDTO> {
+  async login(data: LoginDTO): Promise<Omit<UserResponseDTO, 'password'>> {
     try {
       const user = await this.user.findUserByEmail(data.email);
       if (!user) throw new NotFoundException(`Usuário não encontrado`);
-
       if (!user.password)
         throw new InternalServerErrorException('Senha não encontrada');
 
@@ -49,13 +48,16 @@ export class AuthService {
         data.password,
         user.password,
       );
+
       if (!isPasswordValid)
         throw new NotFoundException(`Credenciais inválidas`);
 
-      const accessToken = this.token.generateAccessToken({
+      const accessToken = await this.token.generateAccessToken({
         userId: user.id,
         email: user.email,
       });
+      console.log('🚀 ~ AuthService ~ login ~ accessToken:', accessToken);
+
       return {
         ...user,
         token: accessToken,

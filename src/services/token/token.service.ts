@@ -7,22 +7,23 @@ import { ExceptionHandler } from 'src/utils/exceptionHandler';
 @Injectable()
 export class TokenService {
   constructor(
-    private readonly token: JwtService,
+    private readonly jwtService: JwtService,
     private readonly exception: ExceptionHandler,
-
   ) {}
 
-  generateAccessToken(data: CreateTokenDTO): string {
+  async generateAccessToken(data: CreateTokenDTO): Promise<string> {
     try {
-      return this.token.sign(data, { expiresIn: '24h' });
+      const accessToken = await this.jwtService.signAsync(data);
+      return accessToken;
     } catch (err) {
+      console.error(err);
       this.exception.serviceExceptionHandler(err as Error);
     }
   }
 
   verifyToken(token: string): any {
     try {
-      return this.token.verify(token);
+      return this.jwtService.verify(token);
     } catch (err) {
       this.exception.serviceExceptionHandler(err as Error);
     }
@@ -34,26 +35,9 @@ export class TokenService {
         new Error('Token não fornecido para decodificação'),
       );
     try {
-      return this.token.decode(token);
+      return this.jwtService.decode(token);
     } catch (err) {
       this.exception.serviceExceptionHandler(err as Error);
     }
   }
-
-  // async invalidateToken(data: CreateTokenBlacklistDTO): Promise<void> {
-  //   try {
-  //     const user = await this.prisma.user.findFirst({where: {id: data.userId}})
-  //     if(!user) throw new NotFoundException('Usuário não encontrado para invalidar')
-  //     await this.prisma.tokenBlacklist.create({
-  //       data: {
-  //         token: data.token,
-  //         userId: data.userId,
-  //         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  //         user: { connect: { id: data.userId } }
-  //       },
-  //     });
-  //   } catch (err: unknown) {
-  //     if (err instanceof Error) this.exception.serviceExceptionHandler(err);
-  //   }
-  // }
 }

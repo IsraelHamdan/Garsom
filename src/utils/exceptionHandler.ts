@@ -47,7 +47,7 @@ export class ExceptionHandler {
       err instanceof BadRequestException ||
       err instanceof NotFoundException
     ) {
-      throw err; // Repassa exceções já tratadas no repositório ou controller
+      throw err;
     }
     if (err instanceof PrismaClientKnownRequestError) {
       switch (err.code) {
@@ -56,7 +56,7 @@ export class ExceptionHandler {
         case 'P2025':
           throw new NotFoundException('Registro não encontrado.');
         default:
-          throw new prismaError(err); // Trata outros erros do Prisma
+          throw new prismaError(err);
       }
     }
     throw new InternalServerErrorException(

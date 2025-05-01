@@ -31,7 +31,10 @@ export class UserService {
 
   async updateUser(id: string, data: updateUserDTO): Promise<UserResponseDTO> {
     try {
-      return await this.userRespository.updateUser(data, id) as UserResponseDTO;
+      return (await this.userRespository.updateUser(
+        data,
+        id,
+      )) as UserResponseDTO;
     } catch (err) {
       this.exception.serviceExceptionHandler(err as Error);
     }
@@ -63,6 +66,14 @@ export class UserService {
     }
   }
 
+  async findAllUsers(): Promise<UserResponseDTO[] | null> {
+    try {
+      return this.userRespository.findMany();
+    } catch (err) {
+      this.exception.serviceExceptionHandler(err as Error);
+    }
+  }
+
   async updatePassword(
     id: string,
     newPassword: string,
@@ -86,14 +97,6 @@ export class UserService {
       );
     }
   }
-
-  // async findAllUsers(): Promise<UserResponseDTO[] | null> {
-  //   try {
-  //     return await this.userRespository.findMany();
-  //   } catch (err) {
-  //     this.exception.serviceExceptionHandler(err as Error);
-  //   }
-  // }
 
   async findUserByEmail(email: string): Promise<UserResponseDTO | null> {
     try {

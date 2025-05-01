@@ -27,10 +27,10 @@ export class UserController {
     return await this.user.findUser(id);
   }
 
-  // @Get()
-  // async findMany(): Promise<UserResponseDTO[] | null> {
-  //   return await this.user.findAllUsers() as UserResponseDTO;
-  // }
+  @Get('findAll')
+  async findMany(): Promise<UserResponseDTO[] | null> {
+    return await this.user.findAllUsers();
+  }
 
   @Put('update')
   async upadateUser(
@@ -49,7 +49,7 @@ export class UserController {
   }
 
   @Delete('delete/:id')
-  async deleteUser(id: string) {
+  async deleteUser(@Param('id') id: string) {
     return await this.user.delete(id);
   }
 }

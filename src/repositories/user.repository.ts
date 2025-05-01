@@ -76,7 +76,10 @@ export class UserRepository {
     }
   }
 
-  async findMany(): Promise<UserResponseDTO[] | null> {
+  async findMany(): Promise<Omit<
+    UserResponseDTO[],
+    'token' | 'password'
+  > | null> {
     try {
       return (await this.prisma.user.findMany()) as UserResponseDTO[];
     } catch (err) {
