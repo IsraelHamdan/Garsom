@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-import { Prisma } from '@prisma/client';
 import {
   IsEmail,
   IsOptional,
@@ -10,39 +9,27 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class updateUserDTO implements Prisma.UserUpdateInput {
+export class updateUserDTO {
   @IsOptional()
   @IsString()
-  nome?: string | Prisma.StringFieldUpdateOperationsInput | undefined;
+  nome?: string | undefined;
 
   @IsEmail()
   @IsOptional()
   @IsString()
-  email?: string | Prisma.StringFieldUpdateOperationsInput | undefined;
+  email?: string | undefined;
 
   @IsStrongPassword()
   @IsString()
   @MinLength(8)
   @MaxLength(16)
-  password?: string | Prisma.StringFieldUpdateOperationsInput | undefined;
-
-  @IsOptional()
-  Client?: Prisma.ClientUpdateOneWithoutUserNestedInput | undefined;
-
-  @IsOptional()
-  table?: Prisma.TableUpdateOneWithoutUserNestedInput | undefined;
-
-  @IsOptional()
-  histories?: Prisma.HistoryUpdateManyWithoutUserNestedInput | undefined;
-
-  @IsOptional()
-  createdTables?: Prisma.TableUpdateManyWithoutCreatedByNestedInput | undefined;
+  password?: string | undefined;
 
   @IsOptional()
   @IsUrl()
-  photoURL?:
-    | string
-    | Prisma.NullableStringFieldUpdateOperationsInput
-    | null
-    | undefined;
+  photoURL?: string | null | undefined;
+
+  @IsOptional()
+  @IsString()
+  token?: string;
 }

@@ -11,7 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
 import { UserResponseDTO } from 'src/DTO/user/userResponseDTO';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import {
   PrismaClientKnownRequestError,
   prismaError,
@@ -20,6 +20,8 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/repositories/user.repository';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { throws } from 'assert';
+import { TokenService } from '../token/token.service';
+import { CreateTokenDTO } from 'src/DTO/token/createToken.dto';
 
 @Injectable()
 export class UserService {
@@ -27,7 +29,50 @@ export class UserService {
     private readonly prisma: PrismaService,
     private readonly userRespository: UserRepository,
     private readonly exception: ExceptionHandler,
+    private readonly token: TokenService,
   ) {}
+
+  async createUser(data: CreateUserDTO): Promise<UserResponseDTO> {
+    try {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      const user = await this.userRespository.createUser({
+        ...data,
+        password: hashedPassword,
+      });
+
+      const tokenPayload = {
+        userId: user.id,
+        email: user.email,
+      };
+
+      const token = await this.updateToken(tokenPayload, user.id);
+
+      return {
+        ...user,
+        token: token,
+      };
+    } catch (err) {
+      console.error('Erro no Controller:', err);
+      this.exception.serviceExceptionHandler(err as Error);
+    }
+  }
+
+  async updateToken(
+    tokenPayload: CreateTokenDTO,
+    userId: string,
+  ): Promise<string> {
+    try {
+      const token = await this.token.generateAccessToken(tokenPayload);
+      if (!token) throw new Error('Erro ao gerar o token');
+      const user = await this.userRespository.findOne(userId);
+      const newUser = { ...user, token: token };
+      await this.userRespository.updateUser(newUser, userId);
+      return token;
+    } catch (err) {
+      console.error('Erro no Controller:', err);
+      this.exception.serviceExceptionHandler(err as Error);
+    }
+  }
 
   async updateUser(id: string, data: updateUserDTO): Promise<UserResponseDTO> {
     try {

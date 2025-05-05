@@ -109,6 +109,8 @@ export class UserRepository {
         password: user.password,
         photoURL: user.photoURL,
         tableId: user.tableId,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       };
     } catch (err) {
       this.exceptionHandler.repositoryExceptionHandler(err as Error);

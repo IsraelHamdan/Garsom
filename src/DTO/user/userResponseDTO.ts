@@ -9,6 +9,9 @@ export class UserResponseDTO {
   tableId: string | null;
   photoURL: string | null;
   token: string;
+  createdAt: Date;
+  updatedAt: Date;
+  //relation coluns
   Client?: Client | null;
   histories?: History[] = [];
   createdTables?: Table[] = [];

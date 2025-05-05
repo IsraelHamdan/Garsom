@@ -9,9 +9,8 @@ import { LoginDTO } from 'src/DTO/user/login.dto';
 import { UserService } from '../user/user.service';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
 import { UserResponseDTO } from 'src/DTO/user/userResponseDTO';
-import { UserRepository } from 'src/repositories/user.repository';
+import { CreateTokenDTO } from 'src/DTO/token/createToken.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,23 +18,7 @@ export class AuthService {
     private readonly token: TokenService,
     private user: UserService,
     private readonly exception: ExceptionHandler,
-    private readonly userRespository: UserRepository,
   ) {}
-
-  async createUser(data: CreateUserDTO): Promise<UserResponseDTO> {
-    try {
-      const hashedPassword = await bcrypt.hash(data.password, 10);
-
-      const newUser = { ...data, password: hashedPassword };
-
-      return (await this.userRespository.createUser(
-        newUser,
-      )) as UserResponseDTO;
-    } catch (err) {
-      console.error('Erro no Controller:', err);
-      this.exception.serviceExceptionHandler(err as Error);
-    }
-  }
 
   async login(data: LoginDTO): Promise<Omit<UserResponseDTO, 'password'>> {
     try {
@@ -51,19 +34,27 @@ export class AuthService {
 
       if (!isPasswordValid)
         throw new NotFoundException(`Credenciais inválidas`);
-
-      const accessToken = await this.token.generateAccessToken({
-        userId: user.id,
+      const tokenPayload: CreateTokenDTO = {
         email: user.email,
-      });
-      console.log('🚀 ~ AuthService ~ login ~ accessToken:', accessToken);
+        userId: user.id,
+      };
 
+      const token = await this.user.updateToken(tokenPayload, user.id);
       return {
         ...user,
-        token: accessToken,
+        token: token,
       };
     } catch (err) {
       this.exception.serviceExceptionHandler(err as Error);
     }
   }
+
+  // async logout(token: string): Promise<void> {
+  //   try {
+  //     const destroyToken = await this.token.
+  //   } catch (err) {
+  //     console.error(err);
+  //     this.exception.serviceExceptionHandler(err as Error);
+  //   }
+  // }
 }

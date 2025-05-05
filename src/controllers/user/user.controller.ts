@@ -6,9 +6,11 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Put,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
 import { UserResponseDTO } from 'src/DTO/user/userResponseDTO';
 import { UserService } from 'src/services/user/user.service';
@@ -21,6 +23,16 @@ export class UserController {
     private readonly user: UserService,
     private readonly exception: ExceptionHandler,
   ) {}
+
+  @Post('createUser')
+  @ApiOperation({ summary: 'Create user' })
+  async createUser(@Body() data: CreateUserDTO): Promise<UserResponseDTO> {
+    try {
+      return await this.user.createUser(data);
+    } catch (err) {
+      this.exception.controllerExceptionHandler(err as Error);
+    }
+  }
 
   @Get('find')
   async findUser(@Param('id') id: string): Promise<UserResponseDTO | null> {

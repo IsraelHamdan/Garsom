@@ -5,9 +5,10 @@ import { UserService } from 'src/services/user/user.service';
 import { UserRepository } from '../../repositories/user.repository';
 import { PrismaModule } from '../prisma.module';
 import { ExceptionModule } from '../exception.module';
+import { TokenModule } from '../auth/token.module';
 
 @Module({
-  imports: [PrismaModule, ExceptionModule],
+  imports: [PrismaModule, ExceptionModule, TokenModule],
   providers: [UserService, UserRepository],
   controllers: [UserController],
   exports: [UserService, UserRepository],
