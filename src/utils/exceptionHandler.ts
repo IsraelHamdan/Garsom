@@ -4,6 +4,7 @@ import {
   BadRequestException,
   NotFoundException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   PrismaClientKnownRequestError,
@@ -45,7 +46,8 @@ export class ExceptionHandler {
   serviceExceptionHandler(err: Error): never {
     if (
       err instanceof BadRequestException ||
-      err instanceof NotFoundException
+      err instanceof NotFoundException ||
+      err instanceof UnauthorizedException
     ) {
       throw err;
     }

@@ -6,6 +6,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
@@ -22,6 +23,7 @@ import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { throws } from 'assert';
 import { TokenService } from '../token/token.service';
 import { CreateTokenDTO } from 'src/DTO/token/createToken.dto';
+import { UpadatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
 
 @Injectable()
 export class UserService {
@@ -64,7 +66,7 @@ export class UserService {
     try {
       const token = await this.token.generateAccessToken(tokenPayload);
       if (!token) throw new Error('Erro ao gerar o token');
-      const user = await this.userRespository.findOne(userId);
+      const user = await this.userRespository.findUser(userId);
       const newUser = { ...user, token: token };
       await this.userRespository.updateUser(newUser, userId);
       return token;
@@ -81,7 +83,18 @@ export class UserService {
         id,
       )) as UserResponseDTO;
     } catch (err) {
-      this.exception.serviceExceptionHandler(err as Error);
+      if (err instanceof UnauthorizedException) {
+        console.error(err.message);
+      }
+      if (err instanceof NotFoundException) {
+        console.error(err.message);
+      }
+      if (err instanceof BadRequestException) {
+        console.error(err.message);
+      }
+      throw new InternalServerErrorException(
+        `Erro não identificado no serive: ${err}`,
+      );
     }
   }
 
@@ -104,7 +117,7 @@ export class UserService {
 
   async findUser(id: string): Promise<UserResponseDTO | null> {
     try {
-      const user = await this.userRespository.findOne(id);
+      const user = await this.userRespository.findUser(id);
       return user as UserResponseDTO;
     } catch (err) {
       this.exception.serviceExceptionHandler(err as Error);
@@ -120,20 +133,29 @@ export class UserService {
   }
 
   async updatePassword(
-    id: string,
-    newPassword: string,
-    oldPassword: string,
-    confirmNewPassword: string,
-  ): Promise<UserResponseDTO> {
+    data: UpadatePasswordDTO,
+  ): Promise<UserResponseDTO | null> {
     try {
-      const hashedPassword = bcrypt.hashSync(newPassword, 10);
+      const isPasswordValid = await this.isValidPassword(
+        data.oldPassword,
+        data.id,
+      );
+      if (!isPasswordValid)
+        throw new BadRequestException(
+          'As senha fonrnecida não é igual ao salvo',
+        );
 
-      const updatedUser = await this.prisma.user.update({
-        where: { id },
-        data: { password: hashedPassword },
-      });
-      const { password, ...userWithoutPassword } = updatedUser;
-      return userWithoutPassword as UserResponseDTO;
+      const hashedPassword = bcrypt.hashSync(data.newPassword, 10);
+
+      if (this.validateToken(data.token) === true) {
+        const updatedUser = await this.prisma.user.update({
+          where: { id: data.id },
+          data: { password: hashedPassword },
+        });
+        const { password, ...userWithoutPassword } = updatedUser;
+        return userWithoutPassword as UserResponseDTO;
+      }
+      return null;
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError)
         throw new prismaError(err);
@@ -158,5 +180,38 @@ export class UserService {
 
   async delete(id: string) {
     return await this.prisma.user.delete({ where: { id: id } });
+  }
+
+  private validateToken(token: string): boolean {
+    try {
+      return this.token.verifyToken(token);
+    } catch (err) {
+      this.exception.serviceExceptionHandler(err as Error);
+    }
+  }
+
+  private async isValidPassword(
+    passwordToCompare: string,
+    userId: string,
+  ): Promise<boolean> {
+    try {
+      const user = await this.userRespository.findUser(userId);
+      if (!user)
+        throw new NotFoundException(
+          'Usuário especificado não encontrado para verificação de senha',
+        );
+      if (!user.password) {
+        throw new BadRequestException('Não foi possível comparar as senhas');
+      }
+      const isValidPassword = await bcrypt.compare(
+        passwordToCompare,
+        user.password,
+      );
+      if (!isValidPassword) return false;
+      return true;
+    } catch (err) {
+      console.error(`Erro ao validar as senhas ${err}`);
+      return false;
+    }
   }
 }

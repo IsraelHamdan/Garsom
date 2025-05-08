@@ -21,9 +21,10 @@ export class TokenService {
     }
   }
 
-  verifyToken(token: string): any {
+  verifyToken(token: string): boolean {
     try {
-      return this.jwtService.verify(token);
+      this.jwtService.verify(token);
+      return true;
     } catch (err) {
       this.exception.serviceExceptionHandler(err as Error);
     }

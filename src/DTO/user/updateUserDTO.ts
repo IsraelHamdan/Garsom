@@ -1,35 +1,26 @@
 /* eslint-disable prettier/prettier */
-import {
-  IsEmail,
-  IsOptional,
-  IsString,
-  IsStrongPassword,
-  IsUrl,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class updateUserDTO {
   @IsOptional()
   @IsString()
+  @ApiPropertyOptional({ type: String, description: 'Nova nome do usuário' })
   nome?: string | undefined;
 
   @IsEmail()
   @IsOptional()
   @IsString()
+  @ApiPropertyOptional({ type: String, description: 'Nova email do usuário' })
   email?: string | undefined;
-
-  @IsStrongPassword()
-  @IsString()
-  @MinLength(8)
-  @MaxLength(16)
-  password?: string | undefined;
 
   @IsOptional()
   @IsUrl()
+  @ApiPropertyOptional({ type: String, description: 'Nova foto do usuário' })
   photoURL?: string | null | undefined;
 
   @IsOptional()
   @IsString()
+  @ApiPropertyOptional({ type: String, description: 'Novo token do usuário' })
   token?: string;
 }

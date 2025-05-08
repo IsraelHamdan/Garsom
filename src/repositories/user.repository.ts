@@ -62,9 +62,7 @@ export class UserRepository {
     }
   }
 
-  async findOne(
-    id: string,
-  ): Promise<Omit<UserResponseDTO, 'token' | 'password'> | null> {
+  async findUser(id: string): Promise<UserResponseDTO | null> {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({ where: { id } });
 

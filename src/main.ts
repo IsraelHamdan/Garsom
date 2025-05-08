@@ -9,6 +9,7 @@ function setupSwagger(app: INestApplication) {
     .setTitle('Mesa Redonda')
     .setDescription('Endpoints da api')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   if (process.env.NODE_ENV === 'dev') {
