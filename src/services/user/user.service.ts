@@ -24,6 +24,7 @@ import { throws } from 'assert';
 import { TokenService } from '../token/token.service';
 import { CreateTokenDTO } from 'src/DTO/token/createToken.dto';
 import { UpadatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
+import passport from 'passport';
 
 @Injectable()
 export class UserService {
@@ -47,29 +48,13 @@ export class UserService {
         email: user.email,
       };
 
-      const token = await this.updateToken(tokenPayload, user.id);
+      const token = await this.token.generateAccessToken(tokenPayload);
+      if (!token) throw new Error('Erro ao gerar o token');
 
       return {
         ...user,
         token: token,
       };
-    } catch (err) {
-      console.error('Erro no Controller:', err);
-      this.exception.serviceExceptionHandler(err as Error);
-    }
-  }
-
-  async updateToken(
-    tokenPayload: CreateTokenDTO,
-    userId: string,
-  ): Promise<string> {
-    try {
-      const token = await this.token.generateAccessToken(tokenPayload);
-      if (!token) throw new Error('Erro ao gerar o token');
-      const user = await this.userRespository.findUser(userId);
-      const newUser = { ...user, token: token };
-      await this.userRespository.updateUser(newUser, userId);
-      return token;
     } catch (err) {
       console.error('Erro no Controller:', err);
       this.exception.serviceExceptionHandler(err as Error);
@@ -97,13 +82,14 @@ export class UserService {
       );
     }
   }
-
-  // melhoria para o futuro, adicionar lógica de verifcação do token
   async updateProfilePhoto(
     id: string,
     photoURL: string,
+    // token: string,
   ): Promise<UserResponseDTO> {
     try {
+      // const isValidToken = this.token.verifyToken(token);
+      // if (isValidToken) throw new Error('Token invalido');
       const user = await this.prisma.user.findUnique({ where: { id: id } });
       if (!user) throw new BadRequestException(`Usuário não encontrado`);
       return (await this.userRespository.updateProfilePhoto(
@@ -133,30 +119,29 @@ export class UserService {
   }
 
   async updatePassword(
+    id: string,
     data: UpadatePasswordDTO,
   ): Promise<UserResponseDTO | null> {
     try {
-      const isPasswordValid = await this.isValidPassword(
-        data.oldPassword,
-        data.id,
-      );
+      console.log(`Id do usuário: ${id}`);
+      const isPasswordValid = await this.isValidPassword(data.oldPassword, id);
       if (!isPasswordValid)
         throw new BadRequestException(
           'As senha fonrnecida não é igual ao salvo',
         );
 
       const hashedPassword = bcrypt.hashSync(data.newPassword, 10);
+      const updatatedPasswordData: UpadatePasswordDTO = {
+        ...data,
+        newPassword: hashedPassword,
+      };
 
-      if (this.validateToken(data.token) === true) {
-        const updatedUser = await this.prisma.user.update({
-          where: { id: data.id },
-          data: { password: hashedPassword },
-        });
-        const { password, ...userWithoutPassword } = updatedUser;
-        return userWithoutPassword as UserResponseDTO;
-      }
-      return null;
+      return await this.userRespository.updatePassword(
+        updatatedPasswordData,
+        id,
+      );
     } catch (err) {
+      console.error(err);
       if (err instanceof PrismaClientKnownRequestError)
         throw new prismaError(err);
       throw new InternalServerErrorException(
@@ -172,7 +157,7 @@ export class UserService {
         throw new NotFoundException(
           `Não foi possivel encontrar o usuário com o email: ${email}`,
         );
-      return user as UserResponseDTO;
+      return user;
     } catch (err) {
       this.exception.serviceExceptionHandler(err as Error);
     }
@@ -212,6 +197,15 @@ export class UserService {
     } catch (err) {
       console.error(`Erro ao validar as senhas ${err}`);
       return false;
+    }
+  }
+
+  async deleteEveryone() {
+    try {
+      await this.userRespository.deleteEveryone();
+    } catch (err) {
+      console.error(`Erro ao deletar todos os usuários: ${err}`);
+      this.exception.serviceExceptionHandler(err as Error);
     }
   }
 }

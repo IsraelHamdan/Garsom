@@ -13,7 +13,6 @@ import {
   Put,
   UnauthorizedException,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -61,7 +60,6 @@ export class UserController {
   @Put('update')
   @UseGuards(new JwtGuard('jwt'))
   @ApiBearerAuth()
-  @ApiConsumes('multipart/form-data')
   async upadateUser(
     @Body() data: updateUserDTO,
     @Param('id') id: string,
@@ -79,28 +77,34 @@ export class UserController {
     }
   }
 
-  @Patch('update password')
+  @Patch('update-password/:id')
   @UseGuards(new JwtGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Alteração de senha do usuário, necessário passar o id dele como argumento',
   })
-  @ApiBearerAuth()
   async updatePassowrd(
-    @Param() data: UpadatePasswordDTO,
+    @Param('id') id: string,
+    @Body() data: UpadatePasswordDTO,
   ): Promise<UserResponseDTO | null> {
     try {
-      return await this.user.updatePassword(data);
+      console.log('ID recebido:', id);
+      console.log('Dados recebidos no body:', data);
+
+      return await this.user.updatePassword(id, data);
     } catch (err) {
+      console.error('Erro capturado no controller:', err);
+      console.error('Stack trace:', err.stack);
+
       if (err instanceof BadRequestException) console.error(err.message);
       if (err instanceof NotFoundException) console.error(err.message);
       if (err instanceof UnauthorizedException) console.error(err.message);
 
       throw new InternalServerErrorException(
-        `Erro no controler de usuário: ${err}`,
+        `Erro no controller de usuário: ${err.message || err}`,
       );
     }
-    return null;
   }
 
   @Patch('updateProfilePhoto')
@@ -142,6 +146,15 @@ export class UserController {
       throw new InternalServerErrorException(
         `Erro no controler de usuário: ${err}`,
       );
+    }
+  }
+
+  @Delete('clear')
+  async deleteEveryone(): Promise<void> {
+    try {
+      await this.user.deleteEveryone();
+    } catch (err) {
+      this.exception.controllerExceptionHandler(err);
     }
   }
 }

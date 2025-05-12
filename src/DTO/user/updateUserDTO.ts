@@ -18,7 +18,7 @@ export class updateUserDTO {
   @IsUrl()
   @ApiPropertyOptional({ type: String, description: 'Nova foto do usuário' })
   photoURL?: string | null | undefined;
-
+  //modificar para o refreshToken no futuro
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({ type: String, description: 'Novo token do usuário' })

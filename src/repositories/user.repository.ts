@@ -6,6 +6,7 @@ import { PrismaClientKnownRequestError } from 'prisma-better-errors';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/services/prisma/prisma.service';
+import { UpadatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
 
 @Injectable()
 export class UserRepository {
@@ -62,6 +63,18 @@ export class UserRepository {
     }
   }
 
+  async updatePassword(
+    data: UpadatePasswordDTO,
+    id: string,
+  ): Promise<Omit<UserResponseDTO, 'password'>> {
+    try {
+      return await this.prisma.user.update({ where: { id: id }, data: {} });
+    } catch (err) {
+      console.error(err);
+      this.exceptionHandler.repositoryExceptionHandler(err);
+    }
+  }
+
   async findUser(id: string): Promise<UserResponseDTO | null> {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({ where: { id } });
@@ -74,10 +87,7 @@ export class UserRepository {
     }
   }
 
-  async findMany(): Promise<Omit<
-    UserResponseDTO[],
-    'token' | 'password'
-  > | null> {
+  async findMany(): Promise<Omit<UserResponseDTO[], 'password'> | null> {
     try {
       return (await this.prisma.user.findMany()) as UserResponseDTO[];
     } catch (err) {
@@ -85,17 +95,7 @@ export class UserRepository {
     }
   }
 
-  async deleteUser(id: string): Promise<void> {
-    try {
-      await this.prisma.user.delete({ where: { id } });
-    } catch (err) {
-      this.exceptionHandler.repositoryExceptionHandler(
-        err as PrismaClientKnownRequestError | Error,
-      );
-    }
-  }
-
-  async findByEmail(email: string): Promise<Omit<UserResponseDTO, 'token'>> {
+  async findByEmail(email: string): Promise<UserResponseDTO> {
     try {
       const user = await this.prisma.user.findUnique({ where: { email } });
       if (!user)
@@ -112,6 +112,24 @@ export class UserRepository {
       };
     } catch (err) {
       this.exceptionHandler.repositoryExceptionHandler(err as Error);
+    }
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    try {
+      await this.prisma.user.delete({ where: { id } });
+    } catch (err) {
+      this.exceptionHandler.repositoryExceptionHandler(
+        err as PrismaClientKnownRequestError | Error,
+      );
+    }
+  }
+
+  async deleteEveryone(): Promise<void> {
+    try {
+      await this.prisma.user.deleteMany();
+    } catch (err) {
+      console.error(`Err: ${err}`);
     }
   }
 }

@@ -39,7 +39,7 @@ export class AuthService {
         userId: user.id,
       };
 
-      const token = await this.user.updateToken(tokenPayload, user.id);
+      const token = await this.token.generateAccessToken(tokenPayload);
       return {
         ...user,
         token: token,

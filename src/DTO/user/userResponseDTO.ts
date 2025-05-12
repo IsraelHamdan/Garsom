@@ -8,7 +8,7 @@ export class UserResponseDTO {
   password?: string;
   tableId: string | null;
   photoURL: string | null;
-  token: string;
+  token?: string;
   createdAt: Date;
   updatedAt: Date;
   //relation coluns

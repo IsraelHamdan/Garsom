@@ -1,13 +1,17 @@
 /* eslint-disable prettier/prettier */
+import { ApiProperty } from '@nestjs/swagger';
 import { IsJWT, IsString, IsStrongPassword, Length } from 'class-validator';
 
 export class UpadatePasswordDTO {
+  @ApiProperty({ type: String, description: 'user id' })
   @IsString()
   id: string;
 
+  @ApiProperty({ type: String, description: 'Token jwt' })
   @IsJWT()
   token: string;
 
+  @ApiProperty({ type: String, description: 'Senha antiga' })
   @IsString()
   oldPassword: string;
 
@@ -19,5 +23,6 @@ export class UpadatePasswordDTO {
   //   minSymbols: 2,
   // })
   @Length(8, 16)
+  @ApiProperty({ type: String, description: 'Nova senha' })
   newPassword: string;
 }
