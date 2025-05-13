@@ -131,15 +131,8 @@ export class UserService {
         );
 
       const hashedPassword = bcrypt.hashSync(data.newPassword, 10);
-      const updatatedPasswordData: UpadatePasswordDTO = {
-        ...data,
-        newPassword: hashedPassword,
-      };
 
-      return await this.userRespository.updatePassword(
-        updatatedPasswordData,
-        id,
-      );
+      return await this.userRespository.updatePassword(hashedPassword, id);
     } catch (err) {
       console.error(err);
       if (err instanceof PrismaClientKnownRequestError)

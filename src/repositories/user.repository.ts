@@ -64,11 +64,16 @@ export class UserRepository {
   }
 
   async updatePassword(
-    data: UpadatePasswordDTO,
+    newPassword: string,
     id: string,
   ): Promise<Omit<UserResponseDTO, 'password'>> {
     try {
-      return await this.prisma.user.update({ where: { id: id }, data: {} });
+      return await this.prisma.user.update({
+        where: { id: id },
+        data: {
+          password: newPassword,
+        },
+      });
     } catch (err) {
       console.error(err);
       this.exceptionHandler.repositoryExceptionHandler(err);

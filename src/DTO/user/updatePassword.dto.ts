@@ -7,10 +7,6 @@ export class UpadatePasswordDTO {
   @IsString()
   id: string;
 
-  @ApiProperty({ type: String, description: 'Token jwt' })
-  @IsJWT()
-  token: string;
-
   @ApiProperty({ type: String, description: 'Senha antiga' })
   @IsString()
   oldPassword: string;
