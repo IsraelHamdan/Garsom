@@ -1,13 +1,9 @@
 /* eslint-disable prettier/prettier */
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
 export class CreateTableDTO {
+  @ApiProperty({ type: String })
   @IsString()
   name: string;
-
-  @IsString()
-  userId: string;
-
-  @IsString()
-  code: string; // Código único da mesa gerado e validado no serviço
 }

@@ -2,7 +2,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as fs from 'fs';
 function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -37,6 +37,12 @@ async function bootstrap() {
     // logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
   app.enableCors();
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+    }),
+  );
   setupSwagger(app);
   await app.listen(3001);
 }

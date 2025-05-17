@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Client, History, Table } from '@prisma/client';
+import { Client, Table } from '@prisma/client';
 
 export class UserResponseDTO {
   id: string;

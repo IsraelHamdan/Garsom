@@ -3,7 +3,7 @@ import { Table, Client, Product, User } from '@prisma/client';
 import { IsDate, IsNumber, IsString, IsUUID } from 'class-validator';
 import { HistoryDTO } from '../history/historyDTO';
 
-export class TableResponseDTO implements Table {
+export class TableResponseDTO {
   @IsString()
   @IsUUID()
   id: string;
@@ -27,8 +27,11 @@ export class TableResponseDTO implements Table {
   @IsString()
   code: string;
 
-  clients: Client[];
+  @IsString()
+  link: string;
+
+  clients?: Client[];
   histories?: HistoryDTO[];
-  products: Product[];
-  createdBy: User;
+  products?: Product[];
+  createdBy?: User;
 }

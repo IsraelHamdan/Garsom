@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { PassportStrategy } from "@nestjs/passport";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
+import { TokenPayload } from 'src/DTO/token/tokenPayload';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -14,11 +15,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwtKey
+      secretOrKey: jwtKey,
     });
   }
 
-   validate(payload: { sub: string; email: string }): unknown {
-    return { userId: payload.sub, email: payload.email };
+  validate(payload: JwtPayload): TokenPayload {
+    const userId = payload.userId;
+
+    if (!userId) {
+      throw new UnauthorizedException(
+        'Token inválido: ID do usuário não encontrado',
+      );
+    }
+    return { userId, email: payload.email };
   }
 }
