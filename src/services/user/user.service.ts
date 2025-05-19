@@ -23,7 +23,7 @@ import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { throws } from 'assert';
 import { TokenService } from '../token/token.service';
 import { CreateTokenDTO } from 'src/DTO/token/createToken.dto';
-import { UpadatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
+import { UpdatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
 import passport from 'passport';
 
 @Injectable()
@@ -120,10 +120,11 @@ export class UserService {
 
   async updatePassword(
     id: string,
-    data: UpadatePasswordDTO,
+    data: UpdatePasswordDTO,
   ): Promise<UserResponseDTO | null> {
     try {
-      console.log(`Id do usuário: ${id}`);
+      console.log(`Senha antiga: ${data.oldPassword}`);
+      console.log(`Nova senha: ${data.newPassword}`);
       const isPasswordValid = await this.isValidPassword(data.oldPassword, id);
       if (!isPasswordValid)
         throw new BadRequestException(

@@ -11,17 +11,19 @@ import {
   Patch,
   Post,
   Put,
+  Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UpadatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
+import { UpdatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
 import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
 import { UserResponseDTO } from 'src/DTO/user/userResponseDTO';
 import { UserService } from 'src/services/user/user.service';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { JwtGuard } from 'src/utils/auth.guard';
+import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
 
 @ApiTags('user controller')
 @Controller('users')
@@ -71,22 +73,23 @@ export class UserController {
     }
   }
 
-  @Patch('update-password/:id')
-  @UseGuards(new JwtGuard('jwt'))
+  @Patch('update-password')
+  @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Alteração de senha do usuário, necessário passar o id dele como argumento',
   })
   async updatePassowrd(
-    @Param('id') id: string,
-    @Body() data: UpadatePasswordDTO,
+    @Body() data: UpdatePasswordDTO,
+    @Req() req: AuthenticatedRequest,
   ): Promise<UserResponseDTO | null> {
     try {
-      console.log('ID recebido:', id);
-      console.log('Dados recebidos no body:', data);
+      const userId = req.user.userId;
+      console.log('Dados recebidos no body:', data?.newPassword);
+      console.log(`Dados recebidos no body: ${JSON.stringify(data)}`);
 
-      return await this.user.updatePassword(id, data);
+      return await this.user.updatePassword(userId, data);
     } catch (err) {
       if (err instanceof BadRequestException) console.error(err.message);
       if (err instanceof NotFoundException) console.error(err.message);

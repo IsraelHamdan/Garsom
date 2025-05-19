@@ -6,7 +6,6 @@ import { PrismaClientKnownRequestError } from 'prisma-better-errors';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/services/prisma/prisma.service';
-import { UpadatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
 
 @Injectable()
 export class UserRepository {
