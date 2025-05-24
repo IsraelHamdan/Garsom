@@ -2,19 +2,24 @@
 import {
   Injectable,
   InternalServerErrorException,
-  OnModuleInit,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateTableDTO } from 'src/DTO/table/createTableDTO';
 import { TableResponseDTO } from 'src/DTO/table/tableResponseDTO';
-import { TableRepository } from 'src/repositories/tabele.repository';
 import { nanoid } from 'nanoid';
 import { ConfigService } from '@nestjs/config';
 
+import { ExceptionHandler } from 'src/utils/exceptionHandler';
+import { TableRepository } from 'src/repositories/table.repository';
+import { JoinOnTableDTO } from 'src/DTO/table/joinOnTable';
+import { UserService } from '../user/user.service';
 @Injectable()
 export class TableService {
   constructor(
-    private readonly tableRepository: TableRepository,
+    private tableRepository: TableRepository,
     private readonly config: ConfigService,
+    private exception: ExceptionHandler,
+    private readonly user: UserService,
   ) {}
 
   async createTable(
@@ -23,7 +28,6 @@ export class TableService {
   ): Promise<TableResponseDTO> {
     try {
       const code: string = nanoid(8);
-
       const newTable = await this.tableRepository.createNewTable({
         name: data.name,
         userId: userId,
@@ -39,4 +43,20 @@ export class TableService {
       throw new InternalServerErrorException(`Erro ao criar mesa: ${err}`);
     }
   }
+
+  // async joinOnTable(data: JoinOnTableDTO): Promise<TableResponseDTO> {
+  //   try {
+  //     const table = await this.tableRepository.findTableByCode(data.code);
+  //     if (!table)
+  //       throw new NotFoundException(
+  //         'Mesa não retornada para juntar o usuário a ela',
+  //       );
+
+  //     const user = await this.user.findUser(data.userId);
+  //     if (!user) throw new NotFoundException();
+  //   } catch (err) {
+  //     console.error(`Erro ao tentar unir o usuário à mesa: ${err}`);
+  //     this.exception.serviceExceptionHandler(err);
+  //   }
+  // }
 }

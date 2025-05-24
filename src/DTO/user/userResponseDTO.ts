@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Client, Table } from '@prisma/client';
+import { Table } from '@prisma/client';
 
 export class UserResponseDTO {
   id: string;
@@ -12,7 +12,7 @@ export class UserResponseDTO {
   createdAt: Date;
   updatedAt: Date;
   //relation coluns
-  Client?: Client | null;
+
   histories?: History[] = [];
   createdTables?: Table[] = [];
   table?: Table | null;

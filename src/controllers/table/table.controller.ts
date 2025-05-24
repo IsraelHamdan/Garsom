@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateTableDTO } from 'src/DTO/table/createTableDTO';
 import { TableResponseDTO } from 'src/DTO/table/tableResponseDTO';
 import { TableService } from 'src/services/table/table.service';

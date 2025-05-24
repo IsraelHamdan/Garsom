@@ -7,14 +7,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { UserService } from 'src/services/user/user.service';
+import { JoinOnTableDTO } from 'src/DTO/table/joinOnTable';
 
 @Injectable()
 export class TableRepository {
   constructor(
     private exception: ExceptionHandler,
     private readonly prisma: PrismaService,
-    private readonly user: UserService,
   ) {
     console.log('PrismaService no TableRepository:', !!this.prisma);
   }
@@ -29,6 +28,22 @@ export class TableRepository {
       return result;
     } catch (err) {
       console.error(`Erro do repository ao criar nova mesa: ${err}`);
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async findTableByCode(code: string): Promise<TableResponseDTO | null> {
+    try {
+      const table = await this.prisma.table.findUnique({
+        where: { code: code },
+      });
+      if (!table)
+        throw new NotFoundException(
+          'Mesa não encontrada para adicionar o usuário',
+        );
+      return table;
+    } catch (err) {
+      console.error(`Erro do repository ao criar nova mesa: ${err}`);
       const errorMessage =
         err instanceof Error ? `${err.name}: ${err.message}` : String(err);
       throw new InternalServerErrorException(
@@ -37,28 +52,14 @@ export class TableRepository {
     }
   }
 
-  // async joinOnTable(userId: string, code: string) {
+  // async addUserOnTable(
+  //   data: JoinOnTableDTO,
+  //   tableId: string,
+  //   userId: string,
+  // ): Promise<TableResponseDTO> {
   //   try {
-  //     const table = await this.prisma.table.findUnique({
-  //       where: { code: code },
-  //     });
-  //     if (!table) throw new NotFoundException(`Mesa não encontrada`);
-
-  //     const updateUser = await this.user.updateUser(userId, {
-  //       tableId: table.id,
-  //     });
   //   } catch (err) {
-  //     console.error(`Erro ao deletar tudo: ${err}`);
   //     this.exception.repositoryExceptionHandler(err);
   //   }
   // }
-
-  async deleteAllTables() {
-    try {
-      return await this.prisma.table.deleteMany();
-    } catch (err) {
-      console.error(`Erro ao deletar tudo: ${err}`);
-      this.exception.repositoryExceptionHandler(err);
-    }
-  }
 }

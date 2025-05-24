@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Client, Product, User } from '@prisma/client';
+import { Product, User } from '@prisma/client';
 import { IsDate, IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class TableResponseDTO {
@@ -27,9 +27,9 @@ export class TableResponseDTO {
   code: string;
 
   @IsString()
-  link: string;
+  link?: string;
 
-  clients?: Client[];
+  participants?: User[];
   products?: Product[];
   createdBy?: User;
 }
