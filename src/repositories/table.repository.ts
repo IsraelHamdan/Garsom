@@ -14,9 +14,7 @@ export class TableRepository {
   constructor(
     private exception: ExceptionHandler,
     private readonly prisma: PrismaService,
-  ) {
-    console.log('PrismaService no TableRepository:', !!this.prisma);
-  }
+  ) {}
 
   async createNewTable(table: {
     name: string;
@@ -52,14 +50,40 @@ export class TableRepository {
     }
   }
 
-  // async addUserOnTable(
-  //   data: JoinOnTableDTO,
-  //   tableId: string,
-  //   userId: string,
-  // ): Promise<TableResponseDTO> {
-  //   try {
-  //   } catch (err) {
-  //     this.exception.repositoryExceptionHandler(err);
-  //   }
-  // }
+  async addUserOnTable(
+    tableId: string,
+    userId: string,
+  ): Promise<TableResponseDTO> {
+    try {
+      const participant = await this.prisma.tableParticipants.create({
+        data: {
+          tableId,
+          userId,
+        },
+        include: {
+          table: {
+            include: {
+              participants: true,
+              Product: true,
+              createdBy: true,
+            },
+          },
+          user: true,
+        },
+      });
+      const response: TableResponseDTO = {
+        id: participant.table.id,
+        name: participant.table.name,
+        created_at: participant.table.created_at,
+        updated_at: participant.table.updated_at,
+        total: participant.table.total,
+        userId: participant.table.userId,
+        code: participant.table.code,
+        createdBy: participant.table.createdBy,
+      };
+      return response;
+    } catch (err) {
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
 }

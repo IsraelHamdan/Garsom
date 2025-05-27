@@ -3,7 +3,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import * as fs from 'fs';
+
 function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
     .setTitle('Mesa Redonda')
@@ -33,9 +38,10 @@ function setupSwagger(app: INestApplication) {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    // logger: ['log', 'error', 'warn', 'debug', 'verbose'],
-  });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  );
   app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
@@ -43,6 +49,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
   setupSwagger(app);
   await app.listen(3001);
 }

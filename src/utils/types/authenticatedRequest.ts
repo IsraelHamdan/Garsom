@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Request } from 'express';
+import { FastifyRequest } from 'fastify';
 import { TokenPayload } from 'src/DTO/token/tokenPayload';
 
-export interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends FastifyRequest {
   user: TokenPayload;
 }
