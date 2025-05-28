@@ -11,8 +11,8 @@ import { ConfigService } from '@nestjs/config';
 
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { TableRepository } from 'src/repositories/table.repository';
-import { JoinOnTableDTO } from 'src/DTO/table/joinOnTable';
 import { UserService } from '../user/user.service';
+import { TableParticipantsResponseDTO } from 'src/DTO/table/tableParticipantsResponseDTO';
 @Injectable()
 export class TableService {
   constructor(
@@ -44,19 +44,24 @@ export class TableService {
     }
   }
 
-  // async joinOnTable(data: JoinOnTableDTO): Promise<TableResponseDTO> {
-  //   try {
-  //     const table = await this.tableRepository.findTableByCode(data.code);
-  //     if (!table)
-  //       throw new NotFoundException(
-  //         'Mesa não retornada para juntar o usuário a ela',
-  //       );
+  async joinOnTable(
+    userId: string,
+    code: string,
+  ): Promise<TableParticipantsResponseDTO> {
+    try {
+      const table = await this.tableRepository.findTableByCode(code);
+      if (!table)
+        throw new NotFoundException(
+          'Mesa não retornada para juntar o usuário a ela',
+        );
 
-  //     const user = await this.user.findUser(data.userId);
-  //     if (!user) throw new NotFoundException();
-  //   } catch (err) {
-  //     console.error(`Erro ao tentar unir o usuário à mesa: ${err}`);
-  //     this.exception.serviceExceptionHandler(err);
-  //   }
-  // }
+      const user = await this.user.findUser(userId);
+      if (!user) throw new NotFoundException('Usuário não encontrado');
+
+      return await this.tableRepository.addUserOnTable(table.id, user.id);
+    } catch (err) {
+      console.error(`Erro ao tentar unir o usuário à mesa: ${err}`);
+      this.exception.serviceExceptionHandler(err);
+    }
+  }
 }

@@ -29,7 +29,7 @@ export class TableResponseDTO {
   @IsString()
   link?: string;
 
-  participants?: User[];
-  products?: Product[];
+  participants?: string[];
+  products?: string[];
   createdBy?: User;
 }

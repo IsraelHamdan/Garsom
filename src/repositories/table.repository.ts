@@ -7,7 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { JoinOnTableDTO } from 'src/DTO/table/joinOnTable';
+import { TableParticipantsResponseDTO } from 'src/DTO/table/tableParticipantsResponseDTO';
 
 @Injectable()
 export class TableRepository {
@@ -53,35 +53,14 @@ export class TableRepository {
   async addUserOnTable(
     tableId: string,
     userId: string,
-  ): Promise<TableResponseDTO> {
+  ): Promise<TableParticipantsResponseDTO> {
     try {
-      const participant = await this.prisma.tableParticipants.create({
+      return await this.prisma.tableParticipants.create({
         data: {
           tableId,
           userId,
         },
-        include: {
-          table: {
-            include: {
-              participants: true,
-              Product: true,
-              createdBy: true,
-            },
-          },
-          user: true,
-        },
       });
-      const response: TableResponseDTO = {
-        id: participant.table.id,
-        name: participant.table.name,
-        created_at: participant.table.created_at,
-        updated_at: participant.table.updated_at,
-        total: participant.table.total,
-        userId: participant.table.userId,
-        code: participant.table.code,
-        createdBy: participant.table.createdBy,
-      };
-      return response;
     } catch (err) {
       this.exception.repositoryExceptionHandler(err);
     }

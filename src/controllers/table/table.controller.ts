@@ -10,9 +10,12 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateTableDTO } from 'src/DTO/table/createTableDTO';
+import { JoinOnTableDTO } from 'src/DTO/table/joinOnTable';
+import { TableParticipantsResponseDTO } from 'src/DTO/table/tableParticipantsResponseDTO';
 import { TableResponseDTO } from 'src/DTO/table/tableResponseDTO';
 import { TableService } from 'src/services/table/table.service';
 import { JwtGuard } from 'src/utils/auth.guard';
+import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
 
 @UseGuards(JwtGuard)
@@ -21,7 +24,7 @@ import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
 export class TableController {
   constructor(
     private readonly tableService: TableService,
-    private readonly config: ConfigService,
+    private exception: ExceptionHandler,
   ) {}
 
   @Post('create-new-table')
@@ -33,7 +36,22 @@ export class TableController {
       const userId = req.user.userId;
       return await this.tableService.createTable(data, userId);
     } catch (err) {
-      throw new InternalServerErrorException(err);
+      console.error(`Erro ao criar mesa: ${err}`);
+      this.exception.controllerExceptionHandler(err);
+    }
+  }
+
+  @Post('joinOnTable')
+  async addUserOnTable(
+    @Req() req: AuthenticatedRequest,
+    @Body() data: JoinOnTableDTO,
+  ): Promise<TableParticipantsResponseDTO> {
+    try {
+      const userId = req.user.userId;
+      return await this.tableService.joinOnTable(userId, data.code);
+    } catch (err) {
+      console.error(`Erro ao adicionar o usuário a mesa: ${err}`);
+      this.exception.controllerExceptionHandler(err);
     }
   }
 }
