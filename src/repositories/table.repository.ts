@@ -111,4 +111,15 @@ export class TableRepository {
       this.exception.repositoryExceptionHandler(err);
     }
   }
+
+  async deleteTable(code: string) {
+    try {
+      return await this.prisma.table.delete({
+        where: { code },
+      });
+    } catch (err) {
+      console.error(`Erro ao tentar atualizar mesa: ${err}`);
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
 }

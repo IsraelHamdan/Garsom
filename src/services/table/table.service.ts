@@ -112,4 +112,15 @@ export class TableService {
       this.exception.serviceExceptionHandler(err);
     }
   }
+
+  async deleteTable(code: string) {
+    try {
+      const table = await this.tableRepository.findTableByCode(code);
+      if (!table) throw new NotFoundException(`Table not found`);
+      return await this.tableRepository.deleteTable(code);
+    } catch (err) {
+      console.error(`Erro ao tentar atualizar mesa: ${err}`);
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
 }

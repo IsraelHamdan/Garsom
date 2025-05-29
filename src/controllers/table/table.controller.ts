@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Param,
@@ -107,6 +108,21 @@ export class TableController {
       if (err instanceof HttpException) {
         throw err;
       }
+      this.exception.controllerExceptionHandler(err);
+    }
+  }
+
+  @Delete('deleteTable/:code')
+  async deleteTable(@Param('code') code: string) {
+    try {
+      return await this.tableService.deleteTable(code);
+    } catch (err) {
+      console.error(`Erro ao deletar a mesa: ${err}`);
+
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
       this.exception.controllerExceptionHandler(err);
     }
   }
