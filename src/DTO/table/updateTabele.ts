@@ -1,14 +1,31 @@
 /* eslint-disable prettier/prettier */
-import { Prisma } from '@prisma/client';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, IsNumber, IsObject } from 'class-validator';
 
 export class UpdateTableDTO {
-  // name?: string | Prisma.StringFieldUpdateOperationsInput | undefined;
-  // clients?: ClientUpdateManyWithoutTableNestedInput | undefined;
-  // updated_at?:
-  //   | string
-  //   | Prisma.DateTimeFieldUpdateOperationsInput
-  //   | Date
-  //   | undefined;
-  // total?: number | Prisma.FloatFieldUpdateOperationsInput | undefined;
-  // products?: Prisma.ProductUpdateManyWithoutTableNestedInput | undefined;
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Nome da mesa',
+    example: 'Mesa 01',
+  })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional({
+    type: Number,
+    description: 'Total da mesa',
+    example: 150.5,
+  })
+  @IsOptional()
+  @IsNumber()
+  total?: number;
+
+  @ApiPropertyOptional({
+    type: Object,
+    description: 'Produtos da mesa',
+  })
+  @IsOptional()
+  @IsObject()
+  Product?: any; // ou crie um DTO específico para produtos
 }

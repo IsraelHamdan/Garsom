@@ -8,6 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { TableParticipantsResponseDTO } from 'src/DTO/table/tableParticipantsResponseDTO';
+import { UpdateTableDTO } from 'src/DTO/table/updateTabele';
 
 @Injectable()
 export class TableRepository {
@@ -62,6 +63,51 @@ export class TableRepository {
         },
       });
     } catch (err) {
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async findAllTabes(): Promise<TableResponseDTO[] | null> {
+    try {
+      const tables = await this.prisma.table.findMany();
+      if (!tables) throw new NotFoundException(`Messas não encontradas`);
+      return tables;
+    } catch (err) {
+      console.log('Erro ao buscar todas as mesas');
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  private async isParticipant(
+    tableId: string,
+    userId: string,
+  ): Promise<boolean> {
+    try {
+      const participant = await this.prisma.tableParticipants.findUnique({
+        where: {
+          userId_tableId: { userId, tableId },
+        },
+      });
+      return !!participant;
+    } catch (err) {
+      console.error(
+        `Erro ao verificar se o participante já esta na mesa: ${err}`,
+      );
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async updateTable(
+    data: UpdateTableDTO,
+    code: string,
+  ): Promise<TableResponseDTO> {
+    try {
+      return await this.prisma.table.update({
+        where: { code },
+        data: { ...data },
+      });
+    } catch (err) {
+      console.error(`Erro ao tentar atualizar mesa: ${err}`);
       this.exception.repositoryExceptionHandler(err);
     }
   }

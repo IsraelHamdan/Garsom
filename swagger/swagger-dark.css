@@ -1,0 +1,58 @@
+/* Tema Escuro para o Swagger */
+body {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+.swagger-ui .topbar {
+  background-color: #1f1f1f;
+}
+
+.swagger-ui .info {
+  background-color: #1f1f1f;
+  border: 1px solid #333;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.swagger-ui .topbar img {
+  content: url('/assets/nest-logo.svg'); /* Substitua com o caminho para a logo do NestJS */
+  height: 40px;
+}
+
+/* Alterar botões */
+.swagger-ui .btn {
+  background-color: #333;
+  color: #e0e0e0;
+  border: 1px solid #555;
+}
+
+.swagger-ui .btn:hover {
+  background-color: #444;
+}
+
+/* Tabelas e blocos de código */
+.swagger-ui table {
+  background-color: #1f1f1f;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+.swagger-ui .highlight-code {
+  background-color: #1e1e1e;
+  color: #c5c5c5;
+}
+
+.swagger-ui .parameters-col_description {
+  color: #aaa;
+}
+
+/* Títulos e links */
+.swagger-ui .opblock-summary {
+  background-color: #292929;
+}
+
+.swagger-ui .opblock-summary-method {
+  background-color: #4a4a4a;
+  color: #fff;
+}

@@ -8,6 +8,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import * as fs from 'fs';
+import { join } from 'path';
 
 function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -21,6 +22,7 @@ function setupSwagger(app: INestApplication) {
     fs.writeFileSync('./swagger-spec.json', JSON.stringify(document));
   }
   SwaggerModule.setup('mesa', app, document, {
+    // customCssUrl: '../swagger/swagger-dark.css',
     explorer: true,
     swaggerOptions: {
       docExpansion: 'none',
@@ -47,9 +49,13 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
+      // forbidNonWhitelisted: true,
     }),
   );
-
+  app.useStaticAssets({
+    root: join(__dirname, '..', 'swagger'),
+    prefix: '/swagger/',
+  });
   setupSwagger(app);
   await app.listen(3001);
 }
