@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
-import { PrismaService } from 'src/services/prisma/prisma.service';
 import { TableResponseDTO } from 'src/DTO/table/tableResponseDTO';
 import {
   Injectable,
@@ -9,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { TableParticipantsResponseDTO } from 'src/DTO/table/tableParticipantsResponseDTO';
 import { UpdateTableDTO } from 'src/DTO/table/updateTabele';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TableRepository {
@@ -23,11 +23,11 @@ export class TableRepository {
     code: string;
   }): Promise<Omit<TableResponseDTO, 'link'>> {
     try {
-      const result = await this.prisma.table.create({ data: table });
-      return result;
+      return await this.prisma.table.create({ data: table });
     } catch (err) {
       console.error(`Erro do repository ao criar nova mesa: ${err}`);
       this.exception.repositoryExceptionHandler(err);
+      throw new InternalServerErrorException('Erro ao criar nova mesa');
     }
   }
 
@@ -74,6 +74,19 @@ export class TableRepository {
       return tables;
     } catch (err) {
       console.log('Erro ao buscar todas as mesas');
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async findTableById(tableId: string): Promise<TableResponseDTO> {
+    try {
+      const table = await this.prisma.table.findUniqueOrThrow({
+        where: { id: tableId },
+      });
+
+      return table;
+    } catch (err) {
+      console.log('Erro ao encontrar mesa: ${err}');
       this.exception.repositoryExceptionHandler(err);
     }
   }

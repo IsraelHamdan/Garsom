@@ -9,6 +9,7 @@ import {
 } from '@nestjs/platform-fastify';
 import * as fs from 'fs';
 import { join } from 'path';
+import { Logger } from 'nestjs-pino';
 
 function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -56,6 +57,7 @@ async function bootstrap() {
     root: join(__dirname, '..', 'swagger'),
     prefix: '/swagger/',
   });
+  app.useLogger(app.get(Logger));
   setupSwagger(app);
   await app.listen(3001);
 }

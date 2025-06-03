@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import {
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { TokenService } from '../token/token.service';
 import { LoginDTO } from 'src/DTO/user/login.dto';
@@ -20,20 +20,32 @@ export class AuthService {
     private readonly exception: ExceptionHandler,
   ) {}
 
-  async login(data: LoginDTO): Promise<Omit<UserResponseDTO, 'password'>> {
+  private async isValidCredentials(
+    email: string,
+    password: string,
+  ): Promise<UserResponseDTO | null> {
     try {
-      const user = await this.user.findUserByEmail(data.email);
-      if (!user) throw new NotFoundException(`Usuário não encontrado`);
-      if (!user.password)
-        throw new InternalServerErrorException('Senha não encontrada');
+      const user = await this.user.findUserByEmail(email);
+      if (!user || !user.password) {
+        throw new UnauthorizedException('Email ou senha incorretos');
+      }
 
-      const isPasswordValid = await bcrypt.compare(
-        data.password,
-        user.password,
-      );
+      const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid)
         throw new NotFoundException(`Credenciais inválidas`);
+
+      return user;
+    } catch (err) {
+      this.exception.serviceExceptionHandler(err);
+    }
+  }
+
+  async login(data: LoginDTO): Promise<Omit<UserResponseDTO, 'password'>> {
+    try {
+      const user = await this.isValidCredentials(data.email, data.password);
+      if (!user) throw new NotFoundException(`Usuário não encontrado`);
+
       const tokenPayload: CreateTokenDTO = {
         email: user.email,
         userId: user.id,
@@ -45,7 +57,7 @@ export class AuthService {
         token: token,
       };
     } catch (err) {
-      this.exception.serviceExceptionHandler(err as Error);
+      this.exception.serviceExceptionHandler(err);
     }
   }
 

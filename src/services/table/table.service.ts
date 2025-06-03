@@ -90,6 +90,17 @@ export class TableService {
     }
   }
 
+  async findTableById(tableId: string): Promise<TableResponseDTO> {
+    try {
+      const table = await this.tableRepository.findTableById(tableId);
+      if (!table) throw new NotFoundException('Mesa não encontrada');
+      return table;
+    } catch (err) {
+      console.error(`Erro ao encontrar mesa`);
+      this.exception.serviceExceptionHandler(err);
+    }
+  }
+
   async updateTable(
     data: UpdateTableDTO,
     code: string,

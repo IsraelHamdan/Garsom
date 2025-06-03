@@ -12,6 +12,7 @@ export class TokenService {
   ) {}
 
   async generateAccessToken(data: CreateTokenDTO): Promise<string> {
+    console.log('🚀 ~ TokenService ~ generateAccessToken ~ data:', data);
     try {
       const accessToken = await this.jwtService.signAsync(data);
       return accessToken;

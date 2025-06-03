@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 import {
   BadRequestException,
   Injectable,
@@ -8,7 +7,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
 import { UserResponseDTO } from 'src/DTO/user/userResponseDTO';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
@@ -25,6 +23,7 @@ import { TokenService } from '../token/token.service';
 import { CreateTokenDTO } from 'src/DTO/token/createToken.dto';
 import { UpdatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
 import passport from 'passport';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {

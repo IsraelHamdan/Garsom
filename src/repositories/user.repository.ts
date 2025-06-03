@@ -5,7 +5,7 @@ import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { PrismaClientKnownRequestError } from 'prisma-better-errors';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/services/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserRepository {

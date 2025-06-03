@@ -13,37 +13,36 @@ import {
 
 @Injectable()
 export class ExceptionHandler {
-  repositoryExceptionHandler(
-    err: PrismaClientKnownRequestError | Error,
-  ): never {
-    if (err instanceof PrismaClientKnownRequestError) {
-      switch (err.code) {
-        case 'P2002':
-          throw new BadRequestException('Registro duplicado detectado.');
-        case 'P2025':
-          throw new NotFoundException('Registro não encontrado.');
-        default:
-          throw new prismaError(err);
-      }
-    }
-    throw new InternalServerErrorException(`Erro inesperado no DB: ${err}`);
+  private logError(err: Error, context: string): void {
+    console.error(`[${context}] - ${err.message}`);
   }
 
-  controllerExceptionHandler(
-    err: Error | BadRequestException | NotFoundException,
-  ): never {
-    if (
-      err instanceof BadRequestException ||
-      err instanceof NotFoundException
-    ) {
-      throw err; // Repassa exceções já tratadas no repositório
+  private ensureError(err: unknown): Error {
+    if (err instanceof Error) {
+      return err;
     }
-    throw new InternalServerErrorException(
-      `Erro inesperado no controller: ${err.message || err}`,
-    );
+    return new Error(String(err));
   }
 
-  serviceExceptionHandler(err: Error): never {
+  private handlePrismaError(err: PrismaClientKnownRequestError): never {
+    switch (err.code) {
+      case 'P2002':
+        throw new BadRequestException('Registro duplicado detectado.');
+      case 'P2025':
+        throw new BadRequestException('Registro duplicado detectado.');
+      case 'P2003':
+        throw new BadRequestException('Violação de chave estrangeira.');
+      case 'P2016':
+        throw new NotFoundException('Registro necessário não foi encontrado.');
+      case 'P2018': // Relation validation failed
+        throw new BadRequestException('Validação de relação falhou.');
+      case 'P2024':
+      default:
+        throw new prismaError(err);
+    }
+  }
+
+  private handleKnownError(err: Error): never {
     if (
       err instanceof BadRequestException ||
       err instanceof NotFoundException ||
@@ -51,18 +50,32 @@ export class ExceptionHandler {
     ) {
       throw err;
     }
-    if (err instanceof PrismaClientKnownRequestError) {
-      switch (err.code) {
-        case 'P2002':
-          throw new BadRequestException('Registro duplicado detectado.');
-        case 'P2025':
-          throw new NotFoundException('Registro não encontrado.');
-        default:
-          throw new prismaError(err);
-      }
-    }
     throw new InternalServerErrorException(
-      `Erro inesperado no serviço: ${err.message || err}`,
+      `Erro inesperado: ${err.message || err}`,
     );
+  }
+
+  repositoryExceptionHandler(err: unknown): never {
+    const error = this.ensureError(err);
+    this.logError(error, 'Repository');
+    if (error instanceof PrismaClientKnownRequestError) {
+      this.handlePrismaError(error);
+    }
+    this.handleKnownError(error);
+  }
+
+  controllerExceptionHandler(err: unknown): never {
+    const error = this.ensureError(err);
+    this.logError(error, 'Controller');
+    this.handleKnownError(error);
+  }
+
+  serviceExceptionHandler(err: unknown): never {
+    const error = this.ensureError(err);
+    this.logError(error, 'Service');
+    if (error instanceof PrismaClientKnownRequestError) {
+      this.handlePrismaError(error);
+    }
+    this.handleKnownError(error);
   }
 }

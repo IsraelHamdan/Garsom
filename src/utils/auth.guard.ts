@@ -26,7 +26,6 @@ export class JwtGuard extends AuthGuard('jwt') {
         throw new UnauthorizedException('Token inválido ou mal-formado');
       }
     }
-
     // Retorna o usuário mantendo a tipagem genérica exigida pela interface
     return user as TUser;
   }

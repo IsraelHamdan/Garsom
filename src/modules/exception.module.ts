@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
 // exception.module.ts
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
-import { PrismaModule } from './prisma/prisma.module';
 
+@Global()
 @Module({
   providers: [ExceptionHandler],
   exports: [ExceptionHandler],
-  imports: [PrismaModule],
+  imports: [],
 })
 export class ExceptionModule {}

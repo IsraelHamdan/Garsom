@@ -21,7 +21,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   validate(payload: JwtPayload): TokenPayload {
     const userId = payload.userId;
-
     if (!userId) {
       throw new UnauthorizedException(
         'Token inválido: ID do usuário não encontrado',
