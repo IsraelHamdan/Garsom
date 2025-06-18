@@ -21,7 +21,6 @@ export class AuthController {
   @UseInterceptors(NoFilesInterceptor())
   async login(@Body() data: LoginDTO): Promise<UserResponseDTO> {
     try {
-      console.log(data);
       return await this.authService.login(data);
     } catch (err) {
       console.error(`Erro ao fazer login: ${err}`);

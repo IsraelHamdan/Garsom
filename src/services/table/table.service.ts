@@ -8,7 +8,6 @@ import { CreateTableDTO } from 'src/DTO/table/createTableDTO';
 import { TableResponseDTO } from 'src/DTO/table/tableResponseDTO';
 import { nanoid } from 'nanoid';
 import { ConfigService } from '@nestjs/config';
-
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { TableRepository } from 'src/repositories/table.repository';
 import { UserService } from '../user/user.service';
@@ -91,6 +90,7 @@ export class TableService {
   }
 
   async findTableById(tableId: string): Promise<TableResponseDTO> {
+    console.log('🚀 ~ TableService ~ findTableById ~ tableId:', tableId);
     try {
       const table = await this.tableRepository.findTableById(tableId);
       if (!table) throw new NotFoundException('Mesa não encontrada');

@@ -17,21 +17,22 @@ export class ProductController {
     private readonly exception: ExceptionHandler,
   ) {}
 
-  @Post('createTable/:tableId')
+  @Post('createProduct/:tableId')
   async createProduct(
-    @Param(':tableId') tableId: string,
-    @Body() data: CreateProductDTO,
+    @Param('tableId') tableId: string,
     @Req() req: AuthenticatedRequest,
-  ): Promise<ProductResponseDTO> {
+    @Body() data: CreateProductDTO,
+  ): Promise<Omit<ProductResponseDTO, 'userId'>> {
     try {
       const userId = req.user.userId;
-      const newProduct = {
-        ...data,
-        tableId,
-      };
-      return await this.product.createProduct(newProduct, userId);
+      console.log(`
+      🚀 ~ Request Log
+      tableId: ${tableId}
+      userId: ${userId}
+      data: ${JSON.stringify(data)}
+    `);
+      return await this.product.createProduct(data, userId, tableId);
     } catch (err) {
-      console.error(`Erro ao criar produto: ${err}`);
       this.exception.controllerExceptionHandler(err);
     }
   }

@@ -79,11 +79,16 @@ export class TableRepository {
   }
 
   async findTableById(tableId: string): Promise<TableResponseDTO> {
+    console.log('🚀 ~ TableRepository ~ findTableById ~ tableId:', tableId);
     try {
-      const table = await this.prisma.table.findUniqueOrThrow({
+      const table = await this.prisma.table.findUnique({
         where: { id: tableId },
       });
-
+      if (!table) {
+        throw new NotFoundException(
+          'Não foi possível encontrar a mesa pelo id',
+        );
+      }
       return table;
     } catch (err) {
       console.log('Erro ao encontrar mesa: ${err}');

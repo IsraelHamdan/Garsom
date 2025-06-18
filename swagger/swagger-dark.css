@@ -1,58 +1,129 @@
-/* Tema Escuro para o Swagger */
-body {
-  background-color: #121212;
-  color: #e0e0e0;
+/* 1. Fundo principal da página (tema escuro) */
+.swagger-ui {
+  background-color: #121212 !important; /* Fundo escuro */
+  color: #e1e1e1 !important; /* Textos em cinza claro */
 }
 
+/* 2. Remove fundo claro que pode aparecer em outras seções */
+.swagger-ui .wrapper {
+  background-color: #121212 !important;
+}
+
+/* 3. Fundo do cabeçalho (se aplicável) */
 .swagger-ui .topbar {
-  background-color: #1f1f1f;
+  background-color: #1c1c1c !important;
+  border-bottom: 1px solid #303030 !important;
 }
 
-.swagger-ui .info {
-  background-color: #1f1f1f;
-  border: 1px solid #333;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.swagger-ui .topbar img {
-  content: url('/assets/nest-logo.svg'); /* Substitua com o caminho para a logo do NestJS */
-  height: 40px;
-}
-
-/* Alterar botões */
-.swagger-ui .btn {
-  background-color: #333;
-  color: #e0e0e0;
-  border: 1px solid #555;
-}
-
-.swagger-ui .btn:hover {
-  background-color: #444;
-}
-
-/* Tabelas e blocos de código */
-.swagger-ui table {
-  background-color: #1f1f1f;
-  color: #e0e0e0;
-  border: 1px solid #333;
-}
-
-.swagger-ui .highlight-code {
-  background-color: #1e1e1e;
-  color: #c5c5c5;
-}
-
-.swagger-ui .parameters-col_description {
-  color: #aaa;
-}
-
-/* Títulos e links */
+/* 4. Fundo dos painéis (áreas de método e detalhes) */
+.swagger-ui .opblock,
 .swagger-ui .opblock-summary {
-  background-color: #292929;
+  background-color: #181818 !important;
+  border: 1px solid #303030 !important;
 }
 
-.swagger-ui .opblock-summary-method {
-  background-color: #4a4a4a;
-  color: #fff;
+/* 5. Corrigindo o fundo branco em áreas específicas */
+/* Bloco de 'Authorize' */
+.auth-wrapper {
+  background-color: #181818 !important;
+  border: 1px solid #303030 !important;
+  color: #ffffff !important;
+}
+
+/* Bloco de filtros "Filter by tag" */
+.filters {
+  background-color: #202020 !important;
+  color: #ffffff !important;
+  border: 1px solid #303030 !important;
+  padding: 8px;
+  border-radius: 5px;
+}
+
+/* 6. Textos gerais */
+.swagger-ui .opblock-summary-method,
+.swagger-ui .opblock-summary-path,
+.swagger-ui .opblock-summary-description,
+.swagger-ui .model-box,
+.swagger-ui .response-col_description {
+  color: #e1e1e1 !important;
+}
+
+/* 7. Campos de entrada */
+.parameter-content input,
+textarea {
+  background-color: #202020 !important;
+  color: #ffffff !important;
+  border: 1px solid #505050 !important;
+}
+
+/* 8. Botões */
+.btn {
+  background-color: #303030 !important;
+  color: #ffffff !important;
+  border: 1px solid #505050 !important;
+}
+
+/* Botão Authorize */
+.auth-wrapper .btn.authorize {
+  background-color: #2e7d32 !important;
+  color: white !important;
+  border: none !important;
+}
+
+/* Hover dos botões */
+.btn:hover {
+  background-color: #404040 !important;
+}
+
+/* 9. Ajustes adicionais para elementos fora do padrão */
+.swagger-ui .opblock .opblock-summary-method {
+  text-transform: uppercase !important;
+  font-weight: bold !;
+}
+
+/* Ajuste completo para o bloco Authorize */
+.auth-wrapper {
+  background-color: #181818 !important; /* Fundo escuro */
+  border: 1px solid #303030 !important; /* Borda sutil */
+  color: #ffffff !important; /* Texto em branco */
+  padding: 10px; /* Espaçamento interno */
+  border-radius: 5px; /* Cantos arredondados */
+}
+
+/* Remover possíveis fundos ou bordas claras de elementos internos */
+.auth-wrapper * {
+  background-color: transparent !important; /* Sem fundo claro */
+  color: #ffffff !important; /* Texto em branco */
+  border: none !important; /* Sem bordas extras */
+}
+
+/* Ajuste adicional para as listas dentro do bloco Authorize */
+.auth-wrapper ul {
+  background-color: #181818 !important; /* Fundo escuro */
+  border: 1px solid #303030 !important; /* Borda leve */
+  color: #ffffff !important; /* Texto branco */
+  padding: 8px;
+  border-radius: 4px;
+  list-style-type: none; /* Remover bullets se houver */
+}
+
+/* Ajustar elementos de texto ou links dentro do bloco */
+.auth-wrapper a {
+  color: #4caf50 !important; /* Links em verde suave */
+  text-decoration: none !important; /* Sem sublinhado */
+}
+
+.auth-wrapper a:hover {
+  text-decoration: underline !important; /* Sublinhado ao passar o mouse */
+}
+
+/* Garantir que o botão "Authorize" siga o tema escuro */
+.auth-wrapper .btn.authorize {
+  background-color: #2e7d32 !important; /* Verde escuro */
+  color: white !important; /* Texto branco */
+  border: 1px solid #303030 !important; /* Borda consistente */
+}
+
+.auth-wrapper .btn.authorize:hover {
+  background-color: #3b8d41 !important; /* Verde mais claro no hover */
 }

@@ -16,10 +16,11 @@ export class ProductRepository {
   async createProduct(
     data: CreateProductDTO,
     userId: string,
+    tableId: string,
   ): Promise<ProductResponseDTO> {
     try {
       return await this.prisma.product.create({
-        data: { ...data, userId },
+        data: { ...data, userId, tableId },
       });
     } catch (err) {
       console.error(`Erro ao tentar criar produto: ${err}`);

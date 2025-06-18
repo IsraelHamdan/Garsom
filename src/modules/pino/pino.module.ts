@@ -11,7 +11,7 @@ import { FastifyRequest } from 'fastify';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         pinoHttp: {
-          level: configService.get<string>('LOG_LEVEL', 'debug'), // Define o nível de log
+          level: configService.get<string>('LOG_LEVEL', 'error'), // Define o nível de log
           transport:
             configService.get<string>('NODE_ENV') !== 'production'
               ? {
@@ -28,6 +28,11 @@ import { FastifyRequest } from 'fastify';
                 headers: req.headers,
               };
             },
+          },
+          customLogLevel: (req, res, error) => {
+            if (error) return 'error';
+            if (req.method === 'POST') return 'info';
+            return 'silent';
           },
         },
       }),

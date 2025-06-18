@@ -19,14 +19,15 @@ export class ProductService {
   async createProduct(
     data: CreateProductDTO,
     userId: string,
+    tableId: string,
   ): Promise<ProductResponseDTO> {
     try {
       const user = await this.user.findUser(userId);
       if (!user) throw new NotFoundException('Usuário não encontrado');
-      const table = await this.table.findTableById(data.tableId);
+      const table = await this.table.findTableById(tableId);
       if (!table) throw new NotFoundException('Mesa não encontrada');
 
-      return await this.product.createProduct(data, userId);
+      return await this.product.createProduct(data, userId, tableId);
     } catch (err) {
       console.error(`Erro ao criar produto`);
       this.exception.serviceExceptionHandler(err);

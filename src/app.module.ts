@@ -22,7 +22,7 @@ import { ConfigModule } from '@nestjs/config';
     ProductModule,
     ExceptionModule,
     PrismaModule,
-    LoggerModule,
+    // LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
