@@ -27,6 +27,19 @@ export class ProductService {
       const table = await this.table.findTableById(tableId);
       if (!table) throw new NotFoundException('Mesa não encontrada');
 
+      if (data.is_shared === true) {
+        if (data.sharedUserIds?.length) {
+          for (const sharedUserId of data.sharedUserIds) {
+            const sharedUser = await this.user.findUser(sharedUserId);
+            if (!sharedUser) {
+              throw new NotFoundException(
+                `Usuário com ID ${sharedUserId} não encontrado para o compartilhamento`,
+              );
+            }
+          }
+        }
+      }
+
       return await this.product.createProduct(data, userId, tableId);
     } catch (err) {
       console.error(`Erro ao criar produto`);

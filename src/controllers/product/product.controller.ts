@@ -25,12 +25,6 @@ export class ProductController {
   ): Promise<Omit<ProductResponseDTO, 'userId'>> {
     try {
       const userId = req.user.userId;
-      console.log(`
-      🚀 ~ Request Log
-      tableId: ${tableId}
-      userId: ${userId}
-      data: ${JSON.stringify(data)}
-    `);
       return await this.product.createProduct(data, userId, tableId);
     } catch (err) {
       this.exception.controllerExceptionHandler(err);

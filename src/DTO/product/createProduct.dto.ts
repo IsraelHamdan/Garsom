@@ -1,6 +1,13 @@
 /* eslint-disable prettier/prettier */
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateProductDTO {
   @ApiProperty({ type: String })
@@ -13,8 +20,14 @@ export class CreateProductDTO {
   @IsNumber()
   price: number;
 
-  // @ApiProperty({ type: Boolean })
-  // @IsNotEmpty()
-  // @IsBoolean()
-  // is_shared: boolean;
+  @ApiProperty({ type: Boolean })
+  @IsNotEmpty()
+  @IsBoolean()
+  is_shared: boolean;
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  sharedUserIds?: string[];
 }

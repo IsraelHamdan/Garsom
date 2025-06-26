@@ -79,7 +79,6 @@ export class TableRepository {
   }
 
   async findTableById(tableId: string): Promise<TableResponseDTO> {
-    console.log('🚀 ~ TableRepository ~ findTableById ~ tableId:', tableId);
     try {
       const table = await this.prisma.table.findUnique({
         where: { id: tableId },

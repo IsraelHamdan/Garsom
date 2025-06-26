@@ -90,7 +90,6 @@ export class TableService {
   }
 
   async findTableById(tableId: string): Promise<TableResponseDTO> {
-    console.log('🚀 ~ TableService ~ findTableById ~ tableId:', tableId);
     try {
       const table = await this.tableRepository.findTableById(tableId);
       if (!table) throw new NotFoundException('Mesa não encontrada');
