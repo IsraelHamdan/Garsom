@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Prisma, Product as ProductModel } from '@prisma/client';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDTO } from 'src/DTO/product/createProduct.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
+import { ProductResponseDTO } from 'src/DTO/product/productResponse.dto';
 
 @Injectable()
 export class ProductRepository {
@@ -45,6 +46,18 @@ export class ProductRepository {
       return await this.prisma.product.create(args);
     } catch (err) {
       console.error(`Erro ao tentar criar produto: ${err}`);
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async findProductById(id: string): Promise<Omit<ProductResponseDTO, 'id'>> {
+    try {
+      const product = await this.prisma.product.findUnique({ where: { id } });
+      if (!product) {
+        throw new NotFoundException();
+      }
+      return product;
+    } catch (err) {
       this.exception.repositoryExceptionHandler(err);
     }
   }

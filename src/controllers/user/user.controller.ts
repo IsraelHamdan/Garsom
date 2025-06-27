@@ -24,6 +24,7 @@ import { UserService } from 'src/services/user/user.service';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { JwtGuard } from 'src/utils/auth.guard';
 import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
+import ApiPostResponse from 'src/utils/decorators/ApiPostResponse';
 
 @ApiTags('user controller')
 @Controller('users')
@@ -34,6 +35,7 @@ export class UserController {
   ) {}
 
   @Post('createUser')
+  @ApiPostResponse(CreateUserDTO)
   @ApiOperation({ summary: 'Create user' })
   async createUser(@Body() data: CreateUserDTO): Promise<UserResponseDTO> {
     try {

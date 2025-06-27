@@ -46,4 +46,14 @@ export class ProductService {
       this.exception.serviceExceptionHandler(err);
     }
   }
+
+  async findProductById(id: string): Promise<Omit<ProductResponseDTO, 'id'>> {
+    try {
+      const product = await this.findProductById(id);
+      if (!product) throw new NotFoundException('Produto não encontrado');
+      return product;
+    } catch (err) {
+      this.exception.serviceExceptionHandler(err);
+    }
+  }
 }

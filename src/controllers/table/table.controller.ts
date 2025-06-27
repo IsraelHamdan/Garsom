@@ -13,7 +13,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { CreateTableDTO } from 'src/DTO/table/createTableDTO';
 import { JoinOnTableDTO } from 'src/DTO/table/joinOnTable';
 import { TableParticipantsResponseDTO } from 'src/DTO/table/tableParticipantsResponseDTO';
@@ -21,6 +21,7 @@ import { TableResponseDTO } from 'src/DTO/table/tableResponseDTO';
 import { UpdateTableDTO } from 'src/DTO/table/updateTabele';
 import { TableService } from 'src/services/table/table.service';
 import { JwtGuard } from 'src/utils/auth.guard';
+import ApiPostResponse from 'src/utils/decorators/ApiPostResponse';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
 
@@ -34,6 +35,8 @@ export class TableController {
   ) {}
 
   @Post('create-new-table')
+  @ApiOperation({ description: 'Creating new table' })
+  @ApiPostResponse(CreateTableDTO)
   async createTable(
     @Body() data: CreateTableDTO,
     @Req() req: AuthenticatedRequest,
