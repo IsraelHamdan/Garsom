@@ -47,7 +47,7 @@ export class ProductService {
     }
   }
 
-  async findProductById(productId: string): Promise<ProductResponseDTO> {
+  async findProductById(productId: string): Promise<ProductResponseDTO | null> {
     try {
       const product = await this.product.findProductById(productId);
       if (!product) throw new NotFoundException('Produto não encontrado');
@@ -58,9 +58,19 @@ export class ProductService {
     }
   }
 
-  async findAllProducts(): Promise<Omit<ProductResponseDTO[], 'id'>> {
+  async findAllProducts(): Promise<Omit<ProductResponseDTO[], 'id'> | null> {
     try {
       return await this.product.findAllProducts();
+    } catch (err) {
+      this.exception.serviceExceptionHandler(err);
+    }
+  }
+
+  async findProductsOnTable(
+    tableId: string,
+  ): Promise<ProductResponseDTO[] | null> {
+    try {
+      return await this.product.findProductsOnTable(tableId);
     } catch (err) {
       this.exception.serviceExceptionHandler(err);
     }

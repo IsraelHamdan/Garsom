@@ -6,7 +6,6 @@ import {
   NotFoundException,
   Param,
   Post,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -80,6 +79,24 @@ export class ProductController {
         throw new NotFoundException('Produtos não encontrados');
       }
       return products;
+    } catch (err) {
+      this.exception.controllerExceptionHandler(err);
+    }
+  }
+
+  @Get('/product/:tableId')
+  @ApiParam({
+    type: String,
+    name: 'tableId',
+    required: true,
+  })
+  @ApiOperation({ description: 'Find products on table' })
+  @ApiGetResponse(ProductResponseDTO)
+  async findProductsOnTable(
+    @Param('tableId') tableId: string,
+  ): Promise<ProductResponseDTO[] | null> {
+    try {
+      return await this.product.findProductsOnTable(tableId);
     } catch (err) {
       this.exception.controllerExceptionHandler(err);
     }

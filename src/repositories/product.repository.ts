@@ -79,4 +79,20 @@ export class ProductRepository {
       this.exception.repositoryExceptionHandler(err);
     }
   }
+
+  async findProductsOnTable(
+    tableId: string,
+  ): Promise<ProductResponseDTO[] | null> {
+    try {
+      const products = await this.prisma.product.findMany({
+        where: { tableId: tableId },
+      });
+      if (!products) {
+        throw new NotFoundException('Produtos não encontrados na mesa');
+      }
+      return products;
+    } catch (err) {
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
 }
