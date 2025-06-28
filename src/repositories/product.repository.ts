@@ -50,13 +50,31 @@ export class ProductRepository {
     }
   }
 
-  async findProductById(id: string): Promise<Omit<ProductResponseDTO, 'id'>> {
+  async findProductById(productId: string): Promise<ProductResponseDTO> {
+    console.log(
+      '🚀 ~ ProductRepository ~ findProductById ~ productId:',
+      productId,
+    );
     try {
-      const product = await this.prisma.product.findUnique({ where: { id } });
+      const product = await this.prisma.product.findUnique({
+        where: { id: productId },
+      });
       if (!product) {
-        throw new NotFoundException();
+        throw new NotFoundException('Produto não encontrado');
       }
       return product;
+    } catch (err) {
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async findAllProducts(): Promise<Omit<ProductResponseDTO[], 'id'>> {
+    try {
+      const products = await this.prisma.product.findMany();
+      if (!products) {
+        throw new NotFoundException('Produtos não encontrados');
+      }
+      return products;
     } catch (err) {
       this.exception.repositoryExceptionHandler(err);
     }

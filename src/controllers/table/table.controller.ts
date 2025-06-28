@@ -13,7 +13,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CreateTableDTO } from 'src/DTO/table/createTableDTO';
 import { JoinOnTableDTO } from 'src/DTO/table/joinOnTable';
 import { TableParticipantsResponseDTO } from 'src/DTO/table/tableParticipantsResponseDTO';
@@ -21,6 +21,7 @@ import { TableResponseDTO } from 'src/DTO/table/tableResponseDTO';
 import { UpdateTableDTO } from 'src/DTO/table/updateTabele';
 import { TableService } from 'src/services/table/table.service';
 import { JwtGuard } from 'src/utils/auth.guard';
+import ApiGetResponse from 'src/utils/decorators/ApiGetResponse';
 import ApiPostResponse from 'src/utils/decorators/ApiPostResponse';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
@@ -71,10 +72,17 @@ export class TableController {
     }
   }
 
-  @Get('findByCode')
+  @Get(':code')
+  @ApiGetResponse(TableResponseDTO)
+  @ApiParam({
+    type: String,
+    name: 'code',
+    required: true,
+  })
   async findTableByCode(
-    @Query('code') code: string,
+    @Param('code') code: string,
   ): Promise<TableResponseDTO | null> {
+    console.log('🚀 ~ TableController ~ code:', code);
     try {
       return this.tableService.findUniqueTable(code);
     } catch (err) {

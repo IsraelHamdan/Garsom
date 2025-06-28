@@ -73,9 +73,7 @@ export class ExceptionHandler {
   serviceExceptionHandler(err: unknown): never {
     const error = this.ensureError(err);
     this.logError(error, 'Service');
-    if (error instanceof PrismaClientKnownRequestError) {
-      this.handlePrismaError(error);
-    }
+
     this.handleKnownError(error);
   }
 }

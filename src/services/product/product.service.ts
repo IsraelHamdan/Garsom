@@ -47,11 +47,20 @@ export class ProductService {
     }
   }
 
-  async findProductById(id: string): Promise<Omit<ProductResponseDTO, 'id'>> {
+  async findProductById(productId: string): Promise<ProductResponseDTO> {
     try {
-      const product = await this.findProductById(id);
+      const product = await this.product.findProductById(productId);
       if (!product) throw new NotFoundException('Produto não encontrado');
       return product;
+    } catch (err) {
+      console.error('Erro ao buscar produto:', err);
+      this.exception.serviceExceptionHandler(err);
+    }
+  }
+
+  async findAllProducts(): Promise<Omit<ProductResponseDTO[], 'id'>> {
+    try {
+      return await this.product.findAllProducts();
     } catch (err) {
       this.exception.serviceExceptionHandler(err);
     }

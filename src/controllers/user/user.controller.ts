@@ -11,11 +11,17 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
 import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
@@ -25,6 +31,7 @@ import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { JwtGuard } from 'src/utils/auth.guard';
 import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
 import ApiPostResponse from 'src/utils/decorators/ApiPostResponse';
+import ApiGetResponse from 'src/utils/decorators/ApiGetResponse';
 
 @ApiTags('user controller')
 @Controller('users')
@@ -45,9 +52,19 @@ export class UserController {
     }
   }
 
-  @Get('find')
-  async findUser(@Param('id') id: string): Promise<UserResponseDTO | null> {
-    return await this.user.findUser(id);
+  @Get(':userId')
+  @ApiParam({
+    name: 'userId',
+    type: String,
+    required: true,
+  })
+  @ApiGetResponse(UserResponseDTO)
+  async findUser(@Param('userId') id: string): Promise<UserResponseDTO | null> {
+    try {
+      return await this.user.findUser(id);
+    } catch (err) {
+      this.exception.controllerExceptionHandler(err);
+    }
   }
 
   @Get('findAll')
