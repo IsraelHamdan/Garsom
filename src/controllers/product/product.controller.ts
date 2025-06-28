@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,6 +8,7 @@ import {
   Param,
   Post,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
@@ -97,6 +99,24 @@ export class ProductController {
   ): Promise<ProductResponseDTO[] | null> {
     try {
       return await this.product.findProductsOnTable(tableId);
+    } catch (err) {
+      this.exception.controllerExceptionHandler(err);
+    }
+  }
+
+  @Get('productsByUser')
+  @ApiGetResponse(ProductResponseDTO)
+  async findProductsByUser(
+    @Req() req: AuthenticatedRequest,
+  ): Promise<Omit<ProductResponseDTO[], 'userId'> | null> {
+    try {
+      const userId = req.user.userId;
+      if (!userId) {
+        throw new UnauthorizedException(
+          'Id do usuário não fornecido na requisição',
+        );
+      }
+      return await this.product.findProductsByUser(userId);
     } catch (err) {
       this.exception.controllerExceptionHandler(err);
     }

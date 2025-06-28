@@ -75,4 +75,14 @@ export class ProductService {
       this.exception.serviceExceptionHandler(err);
     }
   }
+
+  async findProductsByUser(
+    userId: string,
+  ): Promise<Omit<ProductResponseDTO[], 'userId'> | null> {
+    try {
+      return await this.product.findProductsByUser(userId);
+    } catch (err) {
+      this.exception.serviceExceptionHandler(err);
+    }
+  }
 }

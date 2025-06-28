@@ -1,6 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Prisma, Product as ProductModel } from '@prisma/client';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDTO } from 'src/DTO/product/createProduct.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
@@ -68,7 +72,7 @@ export class ProductRepository {
     }
   }
 
-  async findAllProducts(): Promise<Omit<ProductResponseDTO[], 'id'>> {
+  async findAllProducts(): Promise<ProductResponseDTO[]> {
     try {
       const products = await this.prisma.product.findMany();
       if (!products) {
@@ -89,6 +93,22 @@ export class ProductRepository {
       });
       if (!products) {
         throw new NotFoundException('Produtos não encontrados na mesa');
+      }
+      return products;
+    } catch (err) {
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async findProductsByUser(
+    userId: string,
+  ): Promise<Omit<ProductResponseDTO[], 'userId'> | null> {
+    try {
+      const products = await this.prisma.product.findMany({
+        where: { userId },
+      });
+      if (!products) {
+        throw new NotAcceptableException('Produtos nao encontrados');
       }
       return products;
     } catch (err) {
