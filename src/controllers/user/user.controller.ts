@@ -1,19 +1,12 @@
 /* eslint-disable prettier/prettier */
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
-  InternalServerErrorException,
-  NotFoundException,
-  Param,
   Patch,
   Post,
-  Put,
-  Query,
   Req,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -53,14 +46,13 @@ export class UserController {
   }
 
   @Get(':userId')
-  @ApiParam({
-    name: 'userId',
-    type: String,
-    required: true,
-  })
   @ApiGetResponse(UserResponseDTO)
-  async findUser(@Param('userId') id: string): Promise<UserResponseDTO | null> {
+  @ApiOperation({ summary: 'Busca o usuário logado' })
+  async findUser(
+    @Req() req: AuthenticatedRequest,
+  ): Promise<UserResponseDTO | null> {
     try {
+      const id = req.user.userId;
       return await this.user.findUser(id);
     } catch (err) {
       this.exception.controllerExceptionHandler(err);
@@ -69,26 +61,26 @@ export class UserController {
 
   @Get('findAll')
   async findMany(): Promise<UserResponseDTO[] | null> {
-    return await this.user.findAllUsers();
+    try {
+      return await this.user.findAllUsers();
+    } catch (err) {
+      this.exception.controllerExceptionHandler(err);
+    }
   }
 
-  @Put('update')
+  @Patch('update')
   @UseGuards(new JwtGuard('jwt'))
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update user info' })
   async upadateUser(
     @Body() data: updateUserDTO,
-    @Param('id') id: string,
+    @Req() req: AuthenticatedRequest,
   ): Promise<UserResponseDTO> {
     try {
+      const id = req.user.userId;
       return await this.user.updateUser(id, data);
     } catch (err) {
-      if (err instanceof BadRequestException) console.error(err.message);
-      if (err instanceof NotFoundException) console.error(err.message);
-      if (err instanceof UnauthorizedException) console.error(err.message);
-
-      throw new InternalServerErrorException(
-        `Erro no controler de usuário: ${err}`,
-      );
+      this.exception.controllerExceptionHandler(err);
     }
   }
 
@@ -105,18 +97,9 @@ export class UserController {
   ): Promise<UserResponseDTO | null> {
     try {
       const userId = req.user.userId;
-      console.log('Dados recebidos no body:', data?.newPassword);
-      console.log(`Dados recebidos no body: ${JSON.stringify(data)}`);
-
       return await this.user.updatePassword(userId, data);
     } catch (err) {
-      if (err instanceof BadRequestException) console.error(err.message);
-      if (err instanceof NotFoundException) console.error(err.message);
-      if (err instanceof UnauthorizedException) console.error(err.message);
-
-      throw new InternalServerErrorException(
-        `Erro no controller de usuário: ${err}`,
-      );
+      this.exception.controllerExceptionHandler(err);
     }
   }
 
@@ -127,45 +110,27 @@ export class UserController {
       'Alteração de foto do usuário, necessário passar o id dele como argumento',
   })
   async updateProfilePhoto(
-    @Param('id') id: string,
+    @Req() req: AuthenticatedRequest,
     @Body() data: string,
   ): Promise<UserResponseDTO> {
     try {
+      const id = req.user.userId;
       return await this.user.updateProfilePhoto(id, data);
     } catch (err) {
-      if (err instanceof BadRequestException) console.error(err.message);
-      if (err instanceof NotFoundException) console.error(err.message);
-      if (err instanceof UnauthorizedException) console.error(err.message);
-
-      throw new InternalServerErrorException(
-        `Erro no controler de usuário: ${err}`,
-      );
+      this.exception.controllerExceptionHandler(err);
     }
   }
+
   @Delete('delete/:id')
   @UseGuards(new JwtGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Deletar o usuário',
   })
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@Req() req: AuthenticatedRequest) {
     try {
+      const id = req.user.userId;
       return await this.user.delete(id);
-    } catch (err) {
-      if (err instanceof BadRequestException) console.error(err.message);
-      if (err instanceof NotFoundException) console.error(err.message);
-      if (err instanceof UnauthorizedException) console.error(err.message);
-
-      throw new InternalServerErrorException(
-        `Erro no controler de usuário: ${err}`,
-      );
-    }
-  }
-
-  @Delete('clear')
-  async deleteEveryone(): Promise<void> {
-    try {
-      await this.user.deleteEveryone();
     } catch (err) {
       this.exception.controllerExceptionHandler(err);
     }
