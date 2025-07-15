@@ -9,6 +9,7 @@ import { CreateProductDTO } from 'src/DTO/product/createProduct.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { ProductResponseDTO } from 'src/DTO/product/productResponse.dto';
+import { UpdateProductDTO } from 'src/DTO/product/updateProduct.dto';
 
 @Injectable()
 export class ProductRepository {
@@ -111,6 +112,28 @@ export class ProductRepository {
         throw new NotAcceptableException('Produtos nao encontrados');
       }
       return products;
+    } catch (err) {
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async updateProduct(
+    productId: string,
+    data: UpdateProductDTO,
+  ): Promise<ProductResponseDTO> {
+    try {
+      return await this.prisma.product.update({
+        where: { id: productId },
+        data: { ...data },
+      });
+    } catch (err) {
+      this.exception.repositoryExceptionHandler(err);
+    }
+  }
+
+  async deleteProduct(productId: string) {
+    try {
+      return await this.prisma.product.delete({ where: { id: productId } });
     } catch (err) {
       this.exception.repositoryExceptionHandler(err);
     }

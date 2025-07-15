@@ -1,22 +1,30 @@
 /* eslint-disable prettier/prettier */
 import {
-  BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiProperty,
+} from '@nestjs/swagger';
 import { CreateProductDTO } from 'src/DTO/product/createProduct.dto';
 import { ProductResponseDTO } from 'src/DTO/product/productResponse.dto';
+import { UpdateProductDTO } from 'src/DTO/product/updateProduct.dto';
 import { ProductService } from 'src/services/product/product.service';
 import { JwtGuard } from 'src/utils/auth.guard';
 import ApiGetResponse from 'src/utils/decorators/ApiGetResponse';
+import ApiPatchResponse from 'src/utils/decorators/ApiPatchResponse';
 import ApiPostResponse from 'src/utils/decorators/ApiPostResponse';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
@@ -92,7 +100,7 @@ export class ProductController {
     name: 'tableId',
     required: true,
   })
-  @ApiOperation({ description: 'Find products on table' })
+  @ApiOperation({ summary: 'Find products on table' })
   @ApiGetResponse(ProductResponseDTO)
   async findProductsOnTable(
     @Param('tableId') tableId: string,
@@ -106,6 +114,7 @@ export class ProductController {
 
   @Get('productsByUser')
   @ApiGetResponse(ProductResponseDTO)
+  @ApiOperation({ summary: 'Busca os produtos do usuário logado!' })
   async findProductsByUser(
     @Req() req: AuthenticatedRequest,
   ): Promise<Omit<ProductResponseDTO[], 'userId'> | null> {
@@ -117,6 +126,43 @@ export class ProductController {
         );
       }
       return await this.product.findProductsByUser(userId);
+    } catch (err) {
+      this.exception.controllerExceptionHandler(err);
+    }
+  }
+
+  @Patch('/:producId')
+  @ApiOperation({
+    summary: 'Atualizando dados do produto',
+  })
+  @ApiProperty({
+    name: 'productId',
+    type: String,
+    required: true,
+  })
+  @ApiPatchResponse(ProductResponseDTO)
+  async updateProduct(
+    @Param('productId') productId: string,
+    @Body() data: UpdateProductDTO,
+  ): Promise<ProductResponseDTO> {
+    try {
+      return await this.product.updateProduct(productId, data);
+    } catch (err) {
+      this.exception.controllerExceptionHandler(err);
+    }
+  }
+
+  @Delete('/:productId')
+  @ApiOperation({
+    summary: 'Delete product',
+  })
+  @ApiProperty({
+    type: String,
+    name: 'ProductId',
+  })
+  async deleteProduct(@Param('productId') productId: string) {
+    try {
+      return await this.product.deleteProduct(productId);
     } catch (err) {
       this.exception.controllerExceptionHandler(err);
     }
