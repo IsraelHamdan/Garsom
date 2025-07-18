@@ -9,12 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdatePasswordDTO } from 'src/DTO/user/updatePassword.dto';
 import { CreateUserDTO } from 'src/DTO/user/createUserDTO';
 import { updateUserDTO } from 'src/DTO/user/updateUserDTO';
@@ -25,6 +20,8 @@ import { JwtGuard } from 'src/utils/auth.guard';
 import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
 import ApiPostResponse from 'src/utils/decorators/ApiPostResponse';
 import ApiGetResponse from 'src/utils/decorators/ApiGetResponse';
+import ApiPatchResponse from 'src/utils/decorators/ApiPatchResponse';
+import ApiDeleteResponse from 'src/utils/decorators/ApiDeleteResponse';
 
 @ApiTags('user controller')
 @Controller('users')
@@ -60,6 +57,8 @@ export class UserController {
   }
 
   @Get('findAll')
+  @ApiGetResponse(UserResponseDTO)
+  @ApiOperation({ summary: 'Find all users' })
   async findMany(): Promise<UserResponseDTO[] | null> {
     try {
       return await this.user.findAllUsers();
@@ -69,6 +68,7 @@ export class UserController {
   }
 
   @Patch('update')
+  @ApiPatchResponse(UserResponseDTO)
   @UseGuards(new JwtGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user info' })
@@ -91,6 +91,7 @@ export class UserController {
     summary:
       'Alteração de senha do usuário, necessário passar o id dele como argumento',
   })
+  @ApiPatchResponse(UserResponseDTO)
   async updatePassowrd(
     @Body() data: UpdatePasswordDTO,
     @Req() req: AuthenticatedRequest,
@@ -122,6 +123,7 @@ export class UserController {
   }
 
   @Delete('delete/:id')
+  @ApiDeleteResponse(UserResponseDTO)
   @UseGuards(new JwtGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({

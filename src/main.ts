@@ -10,6 +10,15 @@ import {
 import * as fs from 'fs';
 import { join } from 'path';
 // import { Logger } from 'nestjs-pino';
+import helmet from '@fastify/helmet';
+import fastifyCsrf from '@fastify/csrf-protection';
+import fastifyCookie, { FastifyCookieOptions } from '@fastify/cookie';
+import { config } from 'dotenv';
+import fastifyMultipart from '@fastify/multipart';
+
+config();
+
+const CSRF_KEY: string = process.env.CSRF_KEY || 'default_key';
 
 function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -59,6 +68,42 @@ async function bootstrap() {
   });
   // app.useLogger(app.get(Logger));
   setupSwagger(app);
+
+  await app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          'fonts.googleapis.com',
+          'cdn.jsdelivr.net',
+        ],
+        fontSrc: ["'self'", 'fonts.gstatic.com', 'data:'],
+        imgSrc: [
+          "'self'",
+          'data:',
+          'cdn.jsdelivr.net',
+          's3.amazonaws.com',
+          'seu-bucket.s3.amazonaws.com',
+        ],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'cdn.jsdelivr.net'],
+        connectSrc: ["'self'", 'http://localhost:3001/'],
+      },
+    },
+  });
+  await app.register(fastifyCsrf);
+
+  await app.register(fastifyCookie, {
+    secret: CSRF_KEY,
+  } as FastifyCookieOptions);
+
+  
+  await app.register(fastifyMultipart);
+
+
+
+
   await app.listen(3001);
 }
 bootstrap();

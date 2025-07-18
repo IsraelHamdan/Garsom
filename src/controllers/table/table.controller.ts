@@ -9,7 +9,6 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -21,7 +20,9 @@ import { TableResponseDTO } from 'src/DTO/table/tableResponseDTO';
 import { UpdateTableDTO } from 'src/DTO/table/updateTabele';
 import { TableService } from 'src/services/table/table.service';
 import { JwtGuard } from 'src/utils/auth.guard';
+import ApiDeleteResponse from 'src/utils/decorators/ApiDeleteResponse';
 import ApiGetResponse from 'src/utils/decorators/ApiGetResponse';
+import ApiPatchResponse from 'src/utils/decorators/ApiPatchResponse';
 import ApiPostResponse from 'src/utils/decorators/ApiPostResponse';
 import { ExceptionHandler } from 'src/utils/exceptionHandler';
 import { AuthenticatedRequest } from 'src/utils/types/authenticatedRequest';
@@ -36,7 +37,7 @@ export class TableController {
   ) {}
 
   @Post('create-new-table')
-  @ApiOperation({ description: 'Creating new table' })
+  @ApiOperation({ summary: 'Creating new table' })
   @ApiPostResponse(CreateTableDTO)
   async createTable(
     @Body() data: CreateTableDTO,
@@ -45,7 +46,6 @@ export class TableController {
     try {
       const userId = req.user.userId;
       if (!data || Object.keys(data).length === 0) {
-        console.error('Dados da requisição estão vazios!');
         throw new BadRequestException(
           'Body da requisição não pode estar vazio.',
         );
@@ -53,12 +53,13 @@ export class TableController {
 
       return await this.tableService.createTable(data, userId);
     } catch (err) {
-      console.error(`Erro ao criar mesa: ${err}`);
       this.exception.controllerExceptionHandler(err);
     }
   }
 
   @Post('joinOnTable')
+  @ApiPostResponse(TableResponseDTO)
+  @ApiOperation({ summary: 'Users can join on the table' })
   async addUserOnTable(
     @Req() req: AuthenticatedRequest,
     @Body() data: JoinOnTableDTO,
@@ -67,13 +68,13 @@ export class TableController {
       const userId = req.user.userId;
       return await this.tableService.joinOnTable(userId, data.code);
     } catch (err) {
-      console.error(`Erro ao adicionar o usuário a mesa: ${err}`);
       this.exception.controllerExceptionHandler(err);
     }
   }
 
   @Get(':code')
   @ApiGetResponse(TableResponseDTO)
+  @ApiOperation({ summary: 'Find table by code' })
   @ApiParam({
     type: String,
     name: 'code',
@@ -86,22 +87,28 @@ export class TableController {
     try {
       return this.tableService.findUniqueTable(code);
     } catch (err) {
-      console.error(`Erro ao buscar mesa pelo código: ${err}`);
       this.exception.controllerExceptionHandler(err);
     }
   }
 
   @Get('findAll')
+  @ApiOperation({ summary: 'Find all tables' })
+  @ApiGetResponse(TableResponseDTO)
   async findAllTables(): Promise<TableResponseDTO[] | null> {
     try {
       return await this.tableService.findAllTables();
     } catch (err) {
-      console.error(`Erro ao encontrar todas as mesas`);
       this.exception.controllerExceptionHandler(err);
     }
   }
 
   @Patch('updateTable/:code')
+  @ApiPatchResponse(TableResponseDTO)
+  @ApiParam({
+    name: 'code',
+    type: String,
+    required: true,
+  })
   async updateTable(
     @Body() data: UpdateTableDTO,
     @Param('code') code: string,
@@ -124,6 +131,12 @@ export class TableController {
   }
 
   @Delete('deleteTable/:code')
+  @ApiParam({
+    name: 'code',
+    type: String,
+    required: true,
+  })
+  @ApiDeleteResponse(TableResponseDTO)
   async deleteTable(@Param('code') code: string) {
     try {
       return await this.tableService.deleteTable(code);

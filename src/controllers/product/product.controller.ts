@@ -23,6 +23,7 @@ import { ProductResponseDTO } from 'src/DTO/product/productResponse.dto';
 import { UpdateProductDTO } from 'src/DTO/product/updateProduct.dto';
 import { ProductService } from 'src/services/product/product.service';
 import { JwtGuard } from 'src/utils/auth.guard';
+import ApiDeleteResponse from 'src/utils/decorators/ApiDeleteResponse';
 import ApiGetResponse from 'src/utils/decorators/ApiGetResponse';
 import ApiPatchResponse from 'src/utils/decorators/ApiPatchResponse';
 import ApiPostResponse from 'src/utils/decorators/ApiPostResponse';
@@ -132,6 +133,7 @@ export class ProductController {
   }
 
   @Patch('/:producId')
+  @ApiPatchResponse(ProductResponseDTO)
   @ApiOperation({
     summary: 'Atualizando dados do produto',
   })
@@ -153,6 +155,7 @@ export class ProductController {
   }
 
   @Delete('/:productId')
+  @ApiDeleteResponse(ProductResponseDTO)
   @ApiOperation({
     summary: 'Delete product',
   })
